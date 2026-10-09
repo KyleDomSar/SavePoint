@@ -33,7 +33,7 @@ const LoadingSkeleton = ({ count = 6 }) => {
                 left: 0,
                 width: '100%',
                 height: '100%',
-                background: 'linear-gradient(90deg, transparent, rgba(45, 212, 191, 0.12), transparent)',
+                background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent-hover) 12%, transparent), transparent)',
                 backgroundSize: '200% 100%',
                 animation: 'skeletonShimmer 1.4s ease-in-out infinite'
               }}
