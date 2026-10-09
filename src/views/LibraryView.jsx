@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import PageHeader from '../components/PageHeader';
 import GameCard from '../components/GameCard';
 import EmptyState from '../components/EmptyState';
+import CollectionToolbar from '../components/CollectionToolbar';
 import { useCollection } from '../contexts/useCollection';
 
 const SECTIONS = [
@@ -35,9 +37,35 @@ const removeButtonStyle = {
 
 const LibraryView = () => {
   const { items, updateGameStatus, updateGameProgress, removeGame, storageError } = useCollection();
-  const libraryGames = items
-    .filter((game) => game.status !== 'wishlist')
-    .sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('recent');
+  const allLibraryGames = items.filter((game) => game.status !== 'wishlist');
+  const query = searchTerm.trim().toLocaleLowerCase();
+
+  const libraryGames = allLibraryGames
+    .filter((game) => {
+      const genreText = Array.isArray(game.genres)
+        ? game.genres.map((genre) => typeof genre === 'string' ? genre : genre?.name || '').join(' ')
+        : '';
+      const searchableText = [game.title, game.platform, genreText]
+        .filter(Boolean)
+        .join(' ')
+        .toLocaleLowerCase();
+      return searchableText.includes(query);
+    })
+    .sort((a, b) => {
+      const addedDifference = (Number(b.addedAt) || 0) - (Number(a.addedAt) || 0);
+      if (sortBy === 'title') {
+        return String(a.title || '').localeCompare(String(b.title || ''), undefined, { sensitivity: 'base' });
+      }
+      if (sortBy === 'rating') {
+        return ((Number(b.personalRating) || 0) - (Number(a.personalRating) || 0)) || addedDifference;
+      }
+      if (sortBy === 'playtime') {
+        return ((Number(b.playtimePlayed) || 0) - (Number(a.playtimePlayed) || 0)) || addedDifference;
+      }
+      return addedDifference;
+    });
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', width: '100%' }}>
@@ -60,7 +88,41 @@ const LibraryView = () => {
         </div>
       )}
 
-      {SECTIONS.map((section) => {
+      <CollectionToolbar
+        searchTerm={searchTerm}
+        onSearchTermChange={setSearchTerm}
+        sortBy={sortBy}
+        onSortByChange={setSortBy}
+        resultCount={libraryGames.length}
+        totalCount={allLibraryGames.length}
+        itemLabel="games"
+      />
+
+      {query && allLibraryGames.length > 0 && libraryGames.length === 0 ? (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+          <EmptyState
+            title="No matching games"
+            description={`No games in your library match "${searchTerm.trim()}". Try another title, platform, or genre.`}
+          />
+          <button
+            type="button"
+            onClick={() => setSearchTerm('')}
+            style={{
+              backgroundColor: 'var(--accent-bg)',
+              border: '1px solid var(--accent-border)',
+              color: 'var(--text-h)',
+              borderRadius: '8px',
+              padding: '9px 14px',
+              fontSize: '0.8rem',
+              fontWeight: '700',
+              cursor: 'pointer'
+            }}
+          >
+            Clear search
+          </button>
+        </div>
+      ) : SECTIONS.map((section) => {
+        const sectionTotal = allLibraryGames.filter((game) => game.status === section.status);
         const games = libraryGames.filter((game) => game.status === section.status);
 
         return (
@@ -118,6 +180,17 @@ const LibraryView = () => {
                   />
                 ))}
               </div>
+            ) : query && sectionTotal.length > 0 ? (
+              <p style={{
+                margin: 0,
+                padding: '18px',
+                border: '1px dashed var(--border)',
+                borderRadius: '10px',
+                color: 'var(--text)',
+                fontSize: '0.85rem'
+              }}>
+                No games in this section match your search.
+              </p>
             ) : (
               <EmptyState title={section.emptyTitle} description={section.emptyDescription} />
             )}
