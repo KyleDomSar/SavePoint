@@ -94,6 +94,13 @@ const DashboardView = () => {
   const recentGames = [...items]
     .sort((a, b) => (Number(b.addedAt) || 0) - (Number(a.addedAt) || 0))
     .slice(0, 4);
+  const recentCompletedGames = libraryGames
+    .filter((game) => game.status === 'completed')
+    .sort((a, b) => {
+      const completedAtDifference = (Date.parse(b.completedAt || '') || 0) - (Date.parse(a.completedAt || '') || 0);
+      return completedAtDifference || (Number(b.addedAt) || 0) - (Number(a.addedAt) || 0);
+    })
+    .slice(0, 4);
   const ratedGames = libraryGames.filter((game) => Number.isInteger(game.personalRating) && game.personalRating >= 1 && game.personalRating <= 5);
   const averagePersonalRating = ratedGames.length
     ? `${(ratedGames.reduce((total, game) => total + game.personalRating, 0) / ratedGames.length).toFixed(1)} / 5`
@@ -432,6 +439,99 @@ const DashboardView = () => {
             title="No games saved yet"
             description="Games you add from Discover will appear here, so you can jump back to your collection quickly."
           />
+        )}
+      </section>
+
+      <section style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <h2 style={{ fontSize: '1.25rem', color: 'var(--text-h)', margin: 0 }}>Recently Completed</h2>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text)', margin: 0 }}>
+              Your latest finished games, sorted by completion date.
+            </p>
+          </div>
+          <span style={{
+            color: 'var(--text)',
+            fontSize: '0.75rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.04em'
+          }}>
+            {completedCount} {completedCount === 1 ? 'game completed' : 'games completed'}
+          </span>
+        </div>
+
+        {recentCompletedGames.length > 0 ? (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+            gap: '20px',
+            width: '100%'
+          }}>
+            {recentCompletedGames.map((game) => (
+              <GameCard
+                key={game.id}
+                {...game}
+                actionButton={(
+                  <button
+                    type="button"
+                    onClick={() => { window.location.hash = 'library'; }}
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      backgroundColor: 'var(--bg)',
+                      color: 'var(--text-h)',
+                      border: '1px solid var(--border)',
+                      borderRadius: '7px',
+                      padding: '8px 10px',
+                      fontSize: '0.75rem',
+                      fontWeight: '700',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Open Library
+                  </button>
+                )}
+              />
+            ))}
+          </div>
+        ) : (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '14px',
+            padding: '18px',
+            backgroundColor: 'var(--panel-bg)',
+            border: '1px dashed var(--border)',
+            borderRadius: '10px'
+          }}>
+            <p style={{ margin: 0, color: 'var(--text)', fontSize: '0.875rem', lineHeight: 1.6 }}>
+              Finished games will appear here when you mark them as Completed in My Library.
+            </p>
+            <button
+              type="button"
+              onClick={() => { window.location.hash = 'library'; }}
+              style={{
+                backgroundColor: 'transparent',
+                color: 'var(--text-h)',
+                border: '1px solid var(--border)',
+                borderRadius: '8px',
+                padding: '9px 12px',
+                fontSize: '0.8rem',
+                fontWeight: '700',
+                cursor: 'pointer'
+              }}
+            >
+              Open Library
+            </button>
+          </div>
         )}
       </section>
 
