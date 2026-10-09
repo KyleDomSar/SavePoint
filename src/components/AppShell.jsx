@@ -144,6 +144,7 @@ const AppShell = ({ activeTab, setActiveTab, children }) => {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
                   gap: '12px',
                   padding: '12px',
                   borderRadius: '10px',
