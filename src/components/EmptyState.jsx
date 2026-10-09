@@ -3,7 +3,7 @@ import { GamepadIcon } from './Icons';
 // Empty state shown when a search returns no matching games.
 const EmptyState = ({ title = 'No games found', description }) => {
   return (
-    <div style={{
+    <div className="empty-state" style={{
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
