@@ -41,30 +41,30 @@ const GameCard = ({
     switch (s?.toLowerCase()) {
       case 'playing':
         return {
-          bg: 'var(--accent-bg)',
-          border: 'var(--accent-border)',
-          color: 'var(--accent-hover)',
+          bg: 'var(--accent)',
+          border: 'var(--accent-hover)',
+          color: 'var(--text-white)',
           text: 'Playing'
         };
       case 'backlog':
         return {
-          bg: 'rgba(156, 163, 175, 0.15)',
-          border: 'rgba(156, 163, 175, 0.4)',
-          color: '#d1d5db',
+          bg: 'rgba(31, 41, 55, 0.96)',
+          border: 'rgba(156, 163, 175, 0.8)',
+          color: '#f9fafb',
           text: 'Backlog'
         };
       case 'completed':
         return {
-          bg: 'rgba(16, 185, 129, 0.15)',
-          border: 'rgba(16, 185, 129, 0.5)',
-          color: '#34d399',
+          bg: 'rgba(6, 78, 59, 0.96)',
+          border: 'rgba(52, 211, 153, 0.85)',
+          color: '#d1fae5',
           text: 'Completed'
         };
       case 'wishlist':
         return {
-          bg: 'rgba(236, 72, 153, 0.15)',
-          border: 'rgba(236, 72, 153, 0.5)',
-          color: '#f472b6',
+          bg: 'rgba(131, 24, 67, 0.96)',
+          border: 'rgba(244, 114, 182, 0.85)',
+          color: '#fce7f3',
           text: 'Wishlist'
         };
       default:
