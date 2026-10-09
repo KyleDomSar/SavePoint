@@ -37,6 +37,7 @@ const DiscoverView = () => {
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState({ genres: '', platforms: '' });
   const [ordering, setOrdering] = useState('');
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [page, setPage] = useState(1);
 
   const { collection, addGame, updateGameStatus, removeGame } = useCollection();
@@ -98,6 +99,10 @@ const DiscoverView = () => {
   };
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  const activeFilterCount = ['genres', 'platforms'].reduce((count, key) => {
+    const value = filters[key];
+    return count + (value ? value.split(',').filter(Boolean).length : 0);
+  }, 0);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
@@ -126,8 +131,90 @@ const DiscoverView = () => {
           <SortSelector value={ordering} onChange={handleSortChange} />
         </div>
 
-        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '20px' }}>
-          <FilterBar activeFilters={filters} onFiltersChange={handleFiltersChange} />
+        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
+          <button
+            type="button"
+            aria-expanded={isFiltersOpen}
+            aria-controls="discover-filter-drawer"
+            onClick={() => setIsFiltersOpen((open) => !open)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              width: '100%',
+              padding: '8px 2px',
+              backgroundColor: 'transparent',
+              border: 'none',
+              color: 'var(--text-h)',
+              cursor: 'pointer',
+              textAlign: 'left'
+            }}
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              style={{ flexShrink: 0 }}
+            >
+              <path d="M4 6h16M7 12h10m-7 6h4" />
+            </svg>
+            <span style={{ fontSize: '0.9rem', fontWeight: '700' }}>Filters</span>
+            {activeFilterCount > 0 && (
+              <span style={{
+                fontSize: '0.75rem',
+                fontWeight: '700',
+                color: 'var(--accent)',
+                backgroundColor: 'var(--accent-bg)',
+                border: '1px solid var(--accent-border)',
+                borderRadius: '999px',
+                padding: '2px 8px'
+              }}>
+                {activeFilterCount} selected
+              </span>
+            )}
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              style={{
+                marginLeft: 'auto',
+                flexShrink: 0,
+                transform: isFiltersOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                transition: 'transform 0.2s ease'
+              }}
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </button>
+          {isFiltersOpen && (
+            <div
+              id="discover-filter-drawer"
+              style={{
+                marginTop: '12px',
+                padding: '16px',
+                border: '1px solid var(--border)',
+                borderRadius: '10px',
+                backgroundColor: 'var(--bg)',
+                maxHeight: '280px',
+                overflowY: 'auto',
+                overscrollBehavior: 'contain'
+              }}
+            >
+              <FilterBar activeFilters={filters} onFiltersChange={handleFiltersChange} />
+            </div>
+          )}
         </div>
       </div>
 
