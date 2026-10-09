@@ -42,7 +42,7 @@ const CollectionToolbar = ({
     .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
 
   return (
-    <div style={{
+    <div className="collection-toolbar" style={{
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -54,7 +54,7 @@ const CollectionToolbar = ({
       borderRadius: '10px',
       width: '100%'
     }}>
-      <div style={{ flex: '1 1 240px', minWidth: 0, position: 'relative' }}>
+      <div className="collection-toolbar-search" style={{ flex: '1 1 240px', minWidth: 0, position: 'relative' }}>
         <svg
           width="18"
           height="18"
@@ -99,7 +99,7 @@ const CollectionToolbar = ({
         />
       </div>
 
-      <div style={{
+      <div className="collection-toolbar-filters" style={{
         display: 'flex',
         alignItems: 'center',
         flexWrap: 'wrap',
@@ -207,7 +207,7 @@ const CollectionToolbar = ({
         )}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+      <div className="collection-toolbar-sort" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
         <label htmlFor="collection-sort" style={{
           color: 'var(--text)',
           fontSize: '0.8rem',
