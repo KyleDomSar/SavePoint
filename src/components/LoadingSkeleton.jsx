@@ -5,8 +5,8 @@ const LoadingSkeleton = ({ count = 6 }) => {
   return (
     <div style={{
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-      gap: '24px'
+      gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+      gap: '16px'
     }}>
       {Array.from({ length: count }).map((_, i) => (
         <div
@@ -22,7 +22,7 @@ const LoadingSkeleton = ({ count = 6 }) => {
           <div style={{
             position: 'relative',
             paddingTop: '135%',
-            backgroundColor: '#1b1d26',
+            backgroundColor: 'var(--panel-hover)',
             overflow: 'hidden'
           }}>
             <div
@@ -33,17 +33,17 @@ const LoadingSkeleton = ({ count = 6 }) => {
                 left: 0,
                 width: '100%',
                 height: '100%',
-                background: 'linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.12), transparent)',
+                background: 'linear-gradient(90deg, transparent, rgba(45, 212, 191, 0.12), transparent)',
                 backgroundSize: '200% 100%',
                 animation: 'skeletonShimmer 1.4s ease-in-out infinite'
               }}
             />
           </div>
-          <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ height: '14px', width: '70%', backgroundColor: '#1b1d26', borderRadius: '4px' }} />
-            <div style={{ height: '10px', width: '40%', backgroundColor: '#1b1d26', borderRadius: '4px' }} />
+          <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ height: '14px', width: '70%', backgroundColor: 'var(--panel-hover)', borderRadius: '4px' }} />
+            <div style={{ height: '10px', width: '40%', backgroundColor: 'var(--panel-hover)', borderRadius: '4px' }} />
             <div style={{ height: '1px', width: '100%', backgroundColor: 'var(--border)', marginTop: '4px' }} />
-            <div style={{ height: '10px', width: '50%', backgroundColor: '#1b1d26', borderRadius: '4px' }} />
+            <div style={{ height: '10px', width: '50%', backgroundColor: 'var(--panel-hover)', borderRadius: '4px' }} />
           </div>
         </div>
       ))}
