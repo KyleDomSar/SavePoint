@@ -13,16 +13,19 @@ const SECTIONS = [
 ];
 
 const selectStyle = {
-  flex: 1,
+  width: '100%',
   minWidth: 0,
+  appearance: 'none',
+  WebkitAppearance: 'none',
   backgroundColor: 'var(--bg)',
   border: '1px solid var(--border)',
   color: 'var(--text-h)',
   borderRadius: '6px',
-  padding: '8px 10px',
+  padding: '8px 28px 8px 10px',
   fontSize: '0.75rem',
   fontWeight: '600',
-  cursor: 'pointer'
+  cursor: 'pointer',
+  outline: 'none'
 };
 
 const removeButtonStyle = {
@@ -158,16 +161,45 @@ const LibraryView = () => {
                     personalNotes={game.personalNotes}
                     onSaveProgress={(progress) => updateGameProgress(game.id, progress)}
                     actionButton={
-                      <select
-                        aria-label={`Change status for ${game.title}`}
-                        value={game.status}
-                        onChange={(event) => updateGameStatus(game.id, event.target.value)}
-                        style={selectStyle}
-                      >
-                        <option value="playing">Playing</option>
-                        <option value="backlog">Backlog</option>
-                        <option value="completed">Completed</option>
-                      </select>
+                      <div style={{
+                        position: 'relative',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        flex: '0 1 auto',
+                        width: 'max-content',
+                        maxWidth: 'calc(100% - 68px)',
+                        minWidth: 0
+                      }}>
+                        <select
+                          aria-label={`Change status for ${game.title}`}
+                          value={game.status}
+                          onChange={(event) => updateGameStatus(game.id, event.target.value)}
+                          style={selectStyle}
+                        >
+                          <option value="playing">Playing</option>
+                          <option value="backlog">Backlog</option>
+                          <option value="completed">Completed</option>
+                        </select>
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                          style={{
+                            position: 'absolute',
+                            right: '9px',
+                            color: 'var(--text)',
+                            pointerEvents: 'none'
+                          }}
+                        >
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
+                      </div>
                     }
                     secondaryAction={
                       <button
