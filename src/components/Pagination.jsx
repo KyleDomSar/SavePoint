@@ -19,7 +19,7 @@ const Pagination = ({ page, totalPages, hasNext, onPageChange }) => {
 
     return (
       <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0 16px', width: '100%' }}>
-        <div style={{
+        <div className="pagination-controls" style={{
           display: 'flex',
           gap: '4px',
           padding: '8px',
