@@ -175,7 +175,7 @@ export const CollectionProvider = ({ children }) => {
         typeof game !== 'object' ||
         Array.isArray(game) ||
         (typeof game.id !== 'string' && typeof game.id !== 'number') ||
-        !/^\\d+$/.test(String(game.id)) ||
+        !/^\d+$/.test(String(game.id)) ||
         !game.title ||
         typeof game.title !== 'string' ||
         !VALID_STATUSES.includes(game.status)
@@ -215,8 +215,13 @@ export const CollectionProvider = ({ children }) => {
       }
     }
 
-    const added = Object.keys(importedGames).filter((id) => !collection[id]).length;
-    const updated = Object.keys(importedGames).length - added;
+    const importedIds = Object.keys(importedGames);
+    const added = importedIds.filter((id) => !collection[id]).length;
+    const updated = importedIds.length - added;
+
+    if (importedIds.length === 0) {
+      return { success: true, added: 0, updated: 0, count: 0 };
+    }
 
     setCollection((previous) => {
       const next = { ...previous };
