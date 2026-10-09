@@ -1,5 +1,15 @@
 import { SORT_OPTIONS } from '../services/gameApi';
 
+const COMPACT_SORT_LABELS = {
+  '': 'Relevance',
+  '-rating': 'Rating ↓',
+  rating: 'Rating ↑',
+  '-released': 'Newest',
+  released: 'Oldest',
+  name: 'Name A–Z',
+  '-name': 'Name Z–A'
+};
+
 const SortSelector = ({ value, onChange }) => {
   return (
     <div style={{
@@ -46,7 +56,7 @@ const SortSelector = ({ value, onChange }) => {
         >
           {SORT_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
-              {opt.label}
+              {COMPACT_SORT_LABELS[opt.value] || opt.label}
             </option>
           ))}
         </select>
