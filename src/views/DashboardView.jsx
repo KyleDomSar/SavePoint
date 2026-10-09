@@ -6,6 +6,15 @@ import EmptyState from '../components/EmptyState';
 import { GamepadIcon, TrophyIcon, WishlistIcon, ClockIcon, StarIcon } from '../components/Icons';
 import { useCollection } from '../contexts/useCollection';
 
+const COMPLETION_MILESTONES = [
+  { count: 1, title: 'First Clear', description: 'Complete your first game.' },
+  { count: 3, title: 'Getting Started', description: 'Complete 3 games.' },
+  { count: 5, title: 'Rising Completionist', description: 'Complete 5 games.' },
+  { count: 10, title: 'Seasoned Player', description: 'Complete 10 games.' },
+  { count: 25, title: 'Completion Expert', description: 'Complete 25 games.' },
+  { count: 50, title: 'Completion Legend', description: 'Complete 50 games.' }
+];
+
 const DashboardView = () => {
   const { items, storageError, importCollection, updateGameStatus } = useCollection();
   const [pickedBacklogId, setPickedBacklogId] = useState(null);
@@ -86,6 +95,14 @@ const DashboardView = () => {
   const librarySize = libraryGames.length;
   const wishlistCount = items.filter((game) => game.status === 'wishlist').length;
   const completedCount = libraryGames.filter((game) => game.status === 'completed').length;
+  const unlockedMilestones = COMPLETION_MILESTONES.filter((milestone) => completedCount >= milestone.count).length;
+  const nextMilestone = COMPLETION_MILESTONES.find((milestone) => completedCount < milestone.count) || null;
+  const previousMilestoneCount = [...COMPLETION_MILESTONES]
+    .reverse()
+    .find((milestone) => completedCount >= milestone.count)?.count || 0;
+  const milestoneProgress = nextMilestone
+    ? Math.min(100, Math.max(0, ((completedCount - previousMilestoneCount) / (nextMilestone.count - previousMilestoneCount)) * 100))
+    : 100;
   const playingGames = libraryGames.filter((game) => game.status === 'playing');
   const backlogGames = items
     .filter((game) => game.status === 'backlog')
@@ -138,6 +155,140 @@ const DashboardView = () => {
       }}>
         {stats.map((stat) => <StatCard key={stat.title} {...stat} />)}
       </div>
+
+      <section style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+        width: '100%',
+        padding: '20px',
+        backgroundColor: 'var(--panel-bg)',
+        border: '1px solid var(--border)',
+        borderRadius: '12px',
+        boxShadow: 'var(--shadow)'
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <h2 style={{ fontSize: '1.25rem', color: 'var(--text-h)', margin: 0 }}>Completion Achievements</h2>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text)', margin: 0, lineHeight: 1.5 }}>
+              Milestones you unlock as you finish games in your collection.
+            </p>
+          </div>
+          <span style={{
+            flexShrink: 0,
+            border: '1px solid var(--accent-border)',
+            borderRadius: '999px',
+            padding: '5px 10px',
+            backgroundColor: 'var(--accent-bg)',
+            color: 'var(--accent)',
+            fontSize: '0.75rem',
+            fontWeight: '700'
+          }}>
+            {unlockedMilestones} / {COMPLETION_MILESTONES.length} unlocked
+          </span>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 190px), 1fr))',
+          gap: '12px'
+        }}>
+          {COMPLETION_MILESTONES.map((milestone) => {
+            const unlocked = completedCount >= milestone.count;
+            return (
+              <div
+                key={milestone.count}
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '12px',
+                  minWidth: 0,
+                  padding: '14px',
+                  border: `1px solid ${unlocked ? 'var(--accent-border)' : 'var(--border)'}`,
+                  borderRadius: '10px',
+                  backgroundColor: unlocked ? 'var(--accent-bg)' : 'var(--bg)',
+                  opacity: unlocked ? 1 : 0.78
+                }}
+              >
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '9px',
+                  border: `1px solid ${unlocked ? 'var(--accent-border)' : 'var(--border)'}`,
+                  backgroundColor: unlocked ? 'var(--panel-bg)' : 'transparent',
+                  color: unlocked ? 'var(--accent)' : 'var(--text)'
+                }} aria-hidden="true">
+                  <TrophyIcon />
+                </div>
+                <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <h3 style={{
+                    color: unlocked ? 'var(--text-h)' : 'var(--text)',
+                    fontSize: '0.88rem',
+                    lineHeight: 1.35,
+                    overflowWrap: 'anywhere'
+                  }}>
+                    {milestone.title}
+                  </h3>
+                  <p style={{ margin: 0, color: 'var(--text)', fontSize: '0.75rem', lineHeight: 1.45 }}>
+                    {milestone.description}
+                  </p>
+                  <span style={{
+                    marginTop: '2px',
+                    color: unlocked ? 'var(--accent)' : 'var(--text)',
+                    fontSize: '0.7rem',
+                    fontWeight: '700'
+                  }}>
+                    {unlocked ? 'Unlocked' : `${milestone.count - completedCount} more to unlock`}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {nextMilestone ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+              <span style={{ color: 'var(--text-h)', fontSize: '0.8rem', fontWeight: '650' }}>
+                Next: {nextMilestone.title}
+              </span>
+              <span style={{ color: 'var(--text)', fontSize: '0.75rem' }}>
+                {completedCount} / {nextMilestone.count} completed
+              </span>
+            </div>
+            <div
+              role="progressbar"
+              aria-label={`Progress toward ${nextMilestone.title}`}
+              aria-valuemin={0}
+              aria-valuemax={nextMilestone.count}
+              aria-valuenow={Math.min(completedCount, nextMilestone.count)}
+              style={{ height: '8px', overflow: 'hidden', borderRadius: '999px', backgroundColor: 'var(--border)' }}
+            >
+              <div style={{
+                width: `${milestoneProgress}%`,
+                height: '100%',
+                borderRadius: '999px',
+                backgroundColor: 'var(--accent)',
+                transition: 'width 0.25s ease'
+              }} />
+            </div>
+          </div>
+        ) : (
+          <p style={{ margin: 0, color: 'var(--accent)', fontSize: '0.82rem', fontWeight: '700' }}>
+            Every completion milestone is unlocked. Keep building your collection!
+          </p>
+        )}
+      </section>
 
       <section style={{
         display: 'flex',
