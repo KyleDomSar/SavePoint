@@ -164,13 +164,13 @@ const DashboardView = () => {
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
+    <div className="dashboard-view" style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
       <PageHeader
         title="Dashboard"
         description="Your personal video game library analytics and collection overview."
       />
 
-      <div style={{
+      <div className="dashboard-stats-grid" style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
         gap: '20px',
@@ -179,7 +179,7 @@ const DashboardView = () => {
         {stats.map((stat) => <StatCard key={stat.title} {...stat} />)}
       </div>
 
-      <section style={{
+      <section className="dashboard-panel dashboard-insights-panel" style={{
         display: 'flex',
         flexDirection: 'column',
         gap: '16px',
@@ -305,7 +305,7 @@ const DashboardView = () => {
         </div>
       </section>
 
-      <section style={{
+      <section className="dashboard-panel dashboard-achievements-panel" style={{
         display: 'flex',
         flexDirection: 'column',
         gap: '16px',
@@ -439,7 +439,7 @@ const DashboardView = () => {
         )}
       </section>
 
-      <section style={{
+      <section className="dashboard-panel dashboard-roulette-panel" style={{
         display: 'flex',
         flexDirection: 'column',
         gap: '16px',
@@ -699,7 +699,7 @@ const DashboardView = () => {
         </div>
 
         {recentGames.length > 0 ? (
-          <div style={{
+          <div className="game-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
             gap: '16px',
@@ -835,7 +835,7 @@ const DashboardView = () => {
         )}
       </section>
 
-      <div style={{
+      <div className="dashboard-lower-grid" style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
         gap: '24px',
@@ -851,7 +851,7 @@ const DashboardView = () => {
           </div>
 
           {playingGames.length > 0 ? (
-            <div style={{
+            <div className="game-grid" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
               gap: '16px'
