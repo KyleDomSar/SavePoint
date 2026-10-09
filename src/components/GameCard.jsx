@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { StarIcon, ClockIcon } from './Icons';
+import GameDetailsModal from './GameDetailsModal';
 
 const GameCard = ({
+  id,
   title,
   platform,
   coverUrl,
@@ -13,6 +15,7 @@ const GameCard = ({
   secondaryAction
 }) => {
   const [imageError, setImageError] = useState(!coverUrl);
+  const [showDetails, setShowDetails] = useState(false);
 
   const getStatusStyle = (s) => {
     switch (s?.toLowerCase()) {
@@ -57,6 +60,7 @@ const GameCard = ({
   const statusStyle = getStatusStyle(status);
 
   return (
+    <>
     <div
       className="game-card"
       style={{
@@ -217,6 +221,26 @@ const GameCard = ({
               {releaseDate}
             </span>
           )}
+          {id !== undefined && id !== null && (
+            <button
+              type="button"
+              onClick={() => setShowDetails(true)}
+              aria-label={`View details for ${title}`}
+              style={{
+                alignSelf: 'flex-start',
+                background: 'transparent',
+                border: 'none',
+                padding: '3px 0',
+                color: 'var(--accent)',
+                fontSize: '0.75rem',
+                fontWeight: '700',
+                textAlign: 'left',
+                cursor: 'pointer'
+              }}
+            >
+              View details <span aria-hidden="true">→</span>
+            </button>
+          )}
         </div>
 
         {/* Ratings / Playtime + Action Buttons */}
@@ -276,6 +300,13 @@ const GameCard = ({
         </div>
       </div>
     </div>
+    {showDetails && id !== undefined && id !== null && (
+      <GameDetailsModal
+        game={{ id, title, coverUrl, platform, rating, releaseDate }}
+        onClose={() => setShowDetails(false)}
+      />
+    )}
+    </>
   );
 };
 

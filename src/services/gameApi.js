@@ -54,17 +54,32 @@ export function normalizeGame(raw = {}) {
     releaseDate = raw.first_release_date.slice(0, 4);
   }
 
+  const description = typeof raw.description_raw === 'string' && raw.description_raw.trim()
+    ? raw.description_raw.trim()
+    : typeof raw.description === 'string'
+      ? raw.description.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/&quot;/gi, '"').replace(/&#39;/g, "'").replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/\s+/g, ' ').trim()
+      : '';
+
   return {
     id: raw.id,
     name: raw.name,
     title: raw.name,
-    coverUrl: raw.background_image || raw.background_image_original || undefined,
+    coverUrl: raw.background_image || raw.background_image_additional || raw.background_image_original || undefined,
     platform,
     rating,
+    rawgRating: typeof raw.rating === 'number' && Number.isFinite(raw.rating) ? raw.rating : undefined,
     releaseDate,
+    released: typeof raw.released === 'string' ? raw.released : undefined,
     metacritic: raw.metacritic,
-    genres: Array.isArray(raw.genres) ? raw.genres : undefined,
-    platforms: raw.platforms
+    ratingsCount: typeof raw.ratings_count === 'number' ? raw.ratings_count : undefined,
+    genres: Array.isArray(raw.genres) ? raw.genres : [],
+    platforms: Array.isArray(raw.platforms) ? raw.platforms : [],
+    description,
+    website: typeof raw.website === 'string' ? raw.website : '',
+    esrbRating: typeof raw.esrb_rating?.name === 'string' ? raw.esrb_rating.name : '',
+    developers: Array.isArray(raw.developers) ? raw.developers.map((item) => item?.name).filter(Boolean) : [],
+    publishers: Array.isArray(raw.publishers) ? raw.publishers.map((item) => item?.name).filter(Boolean) : [],
+    playtime: typeof raw.playtime === 'number' ? raw.playtime : undefined
   };
 }
 
