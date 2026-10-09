@@ -23,8 +23,24 @@ export const WishlistIcon = ({ className = "w-5 h-5", ...props }) => (
   </svg>
 );
 
-export const CollapseIcon = ({ className = "w-5 h-5", collapsed = false, ...props }) => (
-  <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={`${className} transition-transform duration-200 ${collapsed ? 'rotate-180' : ''}`} {...props}>
+export const CollapseIcon = ({ className = "w-5 h-5", collapsed = false, style, ...props }) => (
+  <svg
+    width="20"
+    height="20"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth="1.5"
+    stroke="currentColor"
+    className={className}
+    style={{
+      transform: collapsed ? 'rotate(180deg)' : 'rotate(0deg)',
+      transition: 'transform 0.2s ease',
+      flexShrink: 0,
+      ...style
+    }}
+    {...props}
+  >
     <path strokeLinecap="round" strokeLinejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5" />
   </svg>
 );
