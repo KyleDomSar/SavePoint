@@ -131,6 +131,29 @@ const DashboardView = () => {
     ? `${((completedCount / librarySize) * 100).toFixed(1)}%`
     : '0.0%';
 
+  const statusBreakdown = [
+    { status: 'playing', label: 'Playing', count: items.filter((game) => game.status === 'playing').length, color: '#8b5cf6' },
+    { status: 'backlog', label: 'Backlog', count: items.filter((game) => game.status === 'backlog').length, color: '#9ca3af' },
+    { status: 'completed', label: 'Completed', count: items.filter((game) => game.status === 'completed').length, color: '#10b981' },
+    { status: 'wishlist', label: 'Wishlist', count: wishlistCount, color: '#ec4899' }
+  ];
+  const trackedGamesCount = items.length;
+  const genreCounts = new Map();
+  libraryGames.forEach((game) => {
+    const seenGenres = new Set();
+    (Array.isArray(game.genres) ? game.genres : []).forEach((genre) => {
+      const name = (typeof genre === 'string' ? genre : genre?.name || '').trim();
+      const key = name.toLocaleLowerCase();
+      if (!name || seenGenres.has(key)) return;
+      seenGenres.add(key);
+      const existing = genreCounts.get(key);
+      genreCounts.set(key, { name: existing?.name || name, count: (existing?.count || 0) + 1 });
+    });
+  });
+  const topGenres = [...genreCounts.values()]
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
+    .slice(0, 5);
+
   const stats = [
     { title: 'Library Size', value: String(librarySize), icon: <GamepadIcon />, description: 'Games saved to your library' },
     { title: 'Wishlist Count', value: String(wishlistCount), icon: <WishlistIcon />, description: 'Games you want to play' },
@@ -155,6 +178,132 @@ const DashboardView = () => {
       }}>
         {stats.map((stat) => <StatCard key={stat.title} {...stat} />)}
       </div>
+
+      <section style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+        width: '100%',
+        padding: '20px',
+        backgroundColor: 'var(--panel-bg)',
+        border: '1px solid var(--border)',
+        borderRadius: '12px',
+        boxShadow: 'var(--shadow)'
+      }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <h2 style={{ fontSize: '1.25rem', color: 'var(--text-h)', margin: 0 }}>Collection Insights</h2>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text)', margin: 0, lineHeight: 1.5 }}>
+            A quick look at your collection status and most common genres.
+          </p>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+          gap: '20px'
+        }}>
+          <div style={{
+            minWidth: 0,
+            padding: '16px',
+            backgroundColor: 'var(--bg)',
+            border: '1px solid var(--border)',
+            borderRadius: '10px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '8px' }}>
+              <h3 style={{ fontSize: '0.95rem', color: 'var(--text-h)', margin: 0 }}>Status Breakdown</h3>
+              <span style={{ color: 'var(--text)', fontSize: '0.75rem' }}>{trackedGamesCount} tracked</span>
+            </div>
+
+            {trackedGamesCount > 0 ? (
+              <>
+                <div
+                  role="img"
+                  aria-label={statusBreakdown.map((entry) => `${entry.label}: ${entry.count}`).join(', ')}
+                  style={{ display: 'flex', height: '10px', width: '100%', overflow: 'hidden', borderRadius: '999px', backgroundColor: 'var(--border)' }}
+                >
+                  {statusBreakdown.filter((entry) => entry.count > 0).map((entry) => (
+                    <div
+                      key={entry.status}
+                      title={`${entry.label}: ${entry.count}`}
+                      style={{ width: `${(entry.count / trackedGamesCount) * 100}%`, height: '100%', backgroundColor: entry.color, minWidth: entry.count > 0 ? '2px' : 0 }}
+                    />
+                  ))}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {statusBreakdown.map((entry) => (
+                    <div key={entry.status} style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'var(--text-h)', fontSize: '0.82rem' }}>
+                          <span aria-hidden="true" style={{ width: '9px', height: '9px', borderRadius: '3px', flexShrink: 0, backgroundColor: entry.color }} />
+                          {entry.label}
+                        </span>
+                        <span style={{ color: 'var(--text)', fontSize: '0.8rem', fontVariantNumeric: 'tabular-nums' }}>
+                          {entry.count} · {((entry.count / trackedGamesCount) * 100).toFixed(0)}%
+                        </span>
+                      </div>
+                      <div style={{ width: '100%', height: '5px', borderRadius: '999px', backgroundColor: 'var(--border)', overflow: 'hidden' }}>
+                        <div style={{ width: `${(entry.count / trackedGamesCount) * 100}%`, height: '100%', backgroundColor: entry.color, borderRadius: '999px' }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <p style={{ margin: 0, padding: '18px 0', color: 'var(--text)', fontSize: '0.85rem', lineHeight: 1.6 }}>
+                Add games to your collection to see their status breakdown here.
+              </p>
+            )}
+          </div>
+
+          <div style={{
+            minWidth: 0,
+            padding: '16px',
+            backgroundColor: 'var(--bg)',
+            border: '1px solid var(--border)',
+            borderRadius: '10px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '8px' }}>
+              <h3 style={{ fontSize: '0.95rem', color: 'var(--text-h)', margin: 0 }}>Top Genres</h3>
+              <span style={{ color: 'var(--text)', fontSize: '0.75rem' }}>Your library</span>
+            </div>
+
+            {topGenres.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {topGenres.map((genre, index) => (
+                  <div key={genre.name.toLocaleLowerCase()} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
+                      <span style={{ color: 'var(--text-h)', fontSize: '0.82rem', minWidth: 0, overflowWrap: 'anywhere' }}>
+                        {index + 1}. {genre.name}
+                      </span>
+                      <span style={{ flexShrink: 0, color: 'var(--text)', fontSize: '0.78rem', fontVariantNumeric: 'tabular-nums' }}>
+                        {genre.count} {genre.count === 1 ? 'game' : 'games'}
+                      </span>
+                    </div>
+                    <div style={{ width: '100%', height: '6px', borderRadius: '999px', backgroundColor: 'var(--border)', overflow: 'hidden' }}>
+                      <div style={{
+                        width: `${(genre.count / (topGenres[0]?.count || 1)) * 100}%`,
+                        height: '100%',
+                        borderRadius: '999px',
+                        backgroundColor: 'var(--accent)'
+                      }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p style={{ margin: 0, padding: '18px 0', color: 'var(--text)', fontSize: '0.85rem', lineHeight: 1.6 }}>
+                Genre insights will show up when your saved library includes genre data.
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
 
       <section style={{
         display: 'flex',
