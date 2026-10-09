@@ -1,6 +1,6 @@
 const PageHeader = ({ title, description, children }) => {
   return (
-    <div style={{
+    <div className="page-header" style={{
       display: 'flex',
       flexDirection: 'column',
       gap: '8px',
@@ -17,7 +17,7 @@ const PageHeader = ({ title, description, children }) => {
         gap: '16px'
       }}>
         <div>
-          <h1 style={{
+          <h1 className="page-header-title" style={{
             fontSize: '1.875rem',
             fontWeight: '700',
             color: 'var(--text-h)',
@@ -27,7 +27,7 @@ const PageHeader = ({ title, description, children }) => {
             {title}
           </h1>
           {description && (
-            <p style={{
+            <p className="page-header-description" style={{
               color: 'var(--text)',
               fontSize: '0.875rem',
               margin: '4px 0 0 0'
