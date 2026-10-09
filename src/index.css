@@ -248,6 +248,11 @@ canvas {
 }
 
 @media (max-width: 768px) {
+  .main-content input,
+  .main-content textarea {
+    font-size: 16px !important;
+  }
+
   .main-content.main-content {
     padding: 24px !important;
   }
@@ -426,6 +431,10 @@ canvas {
 }
 
 @media (max-width: 480px) {
+  .page-header {
+    margin-bottom: 14px !important;
+  }
+
   .main-content.main-content {
     padding: 24px 16px !important;
   }
@@ -493,7 +502,6 @@ canvas {
   }
 
   .dashboard-stats-grid {
-    grid-template-columns: minmax(0, 1fr) !important;
     gap: 10px !important;
   }
 
@@ -512,6 +520,10 @@ canvas {
 }
 
 @media (max-width: 340px) {
+  .dashboard-stats-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
   .main-content.main-content {
     padding: 18px 10px !important;
   }
