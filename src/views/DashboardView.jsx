@@ -7,7 +7,8 @@ import { GamepadIcon, TrophyIcon, WishlistIcon, ClockIcon, StarIcon } from '../c
 import { useCollection } from '../contexts/useCollection';
 
 const DashboardView = () => {
-  const { items, storageError, importCollection } = useCollection();
+  const { items, storageError, importCollection, updateGameStatus } = useCollection();
+  const [pickedBacklogId, setPickedBacklogId] = useState(null);
   const backupInputRef = useRef(null);
   const [backupMessage, setBackupMessage] = useState(null);
 
@@ -86,6 +87,10 @@ const DashboardView = () => {
   const wishlistCount = items.filter((game) => game.status === 'wishlist').length;
   const completedCount = libraryGames.filter((game) => game.status === 'completed').length;
   const playingGames = libraryGames.filter((game) => game.status === 'playing');
+  const backlogGames = items
+    .filter((game) => game.status === 'backlog')
+    .sort((a, b) => (Number(b.addedAt) || 0) - (Number(a.addedAt) || 0));
+  const pickedBacklogGame = backlogGames.find((game) => String(game.id) === String(pickedBacklogId)) || null;
   const recentGames = [...items]
     .sort((a, b) => (Number(b.addedAt) || 0) - (Number(a.addedAt) || 0))
     .slice(0, 4);
@@ -126,6 +131,239 @@ const DashboardView = () => {
       }}>
         {stats.map((stat) => <StatCard key={stat.title} {...stat} />)}
       </div>
+
+      <section style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+        width: '100%',
+        padding: '20px',
+        backgroundColor: 'var(--panel-bg)',
+        border: '1px solid var(--border)',
+        borderRadius: '12px',
+        boxShadow: 'var(--shadow)'
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <h2 style={{ fontSize: '1.25rem', color: 'var(--text-h)', margin: 0 }}>Backlog Roulette</h2>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text)', margin: 0, lineHeight: 1.5 }}>
+              Can't decide what to play? Pick a random game from your backlog.
+            </p>
+          </div>
+          <span style={{ color: 'var(--text)', fontSize: '0.8rem' }}>
+            {backlogGames.length} {backlogGames.length === 1 ? 'game' : 'games'} in backlog
+          </span>
+        </div>
+
+        {pickedBacklogGame ? (
+          <div style={{
+            display: 'flex',
+            alignItems: 'stretch',
+            flexWrap: 'wrap',
+            gap: '16px',
+            padding: '14px',
+            backgroundColor: 'var(--bg)',
+            border: '1px solid var(--border)',
+            borderRadius: '10px'
+          }}>
+            <div style={{
+              width: '96px',
+              height: '128px',
+              flexShrink: 0,
+              position: 'relative',
+              overflow: 'hidden',
+              borderRadius: '7px',
+              background: 'linear-gradient(135deg, #29223c 0%, #0a0b0d 100%)'
+            }}>
+              {pickedBacklogGame.coverUrl && (
+                <img
+                  src={pickedBacklogGame.coverUrl}
+                  alt={`${pickedBacklogGame.title} cover`}
+                  onError={(event) => {
+                    event.currentTarget.style.display = 'none';
+                    if (event.currentTarget.nextElementSibling) {
+                      event.currentTarget.nextElementSibling.style.display = 'flex';
+                    }
+                  }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+              )}
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                display: pickedBacklogGame.coverUrl ? 'none' : 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
+                padding: '8px',
+                color: 'var(--text-h)',
+                fontSize: '0.75rem',
+                fontWeight: '700',
+                overflowWrap: 'anywhere'
+              }}>
+                {pickedBacklogGame.title}
+              </div>
+            </div>
+
+            <div style={{
+              flex: '1 1 220px',
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              gap: '10px'
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <span style={{
+                  alignSelf: 'flex-start',
+                  border: '1px solid var(--accent-border)',
+                  borderRadius: '999px',
+                  padding: '3px 8px',
+                  color: 'var(--accent)',
+                  backgroundColor: 'var(--accent-bg)',
+                  fontSize: '0.7rem',
+                  fontWeight: '700'
+                }}>
+                  Random pick
+                </span>
+                <h3 style={{
+                  margin: 0,
+                  color: 'var(--text-h)',
+                  fontSize: '1.1rem',
+                  lineHeight: 1.35,
+                  overflowWrap: 'anywhere'
+                }}>
+                  {pickedBacklogGame.title}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text)', fontSize: '0.82rem', lineHeight: 1.5 }}>
+                  {[pickedBacklogGame.platform, pickedBacklogGame.releaseDate].filter(Boolean).join(' · ') || 'Ready when you are'}
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '4px' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    updateGameStatus(pickedBacklogGame.id, 'playing');
+                    setPickedBacklogId(null);
+                  }}
+                  style={{
+                    backgroundColor: 'var(--accent)',
+                    color: 'var(--text-h)',
+                    border: '1px solid var(--accent-border)',
+                    borderRadius: '8px',
+                    padding: '9px 12px',
+                    fontSize: '0.8rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    boxShadow: 'var(--glow)'
+                  }}
+                >
+                  Mark as Playing
+                </button>
+                <button
+                  type="button"
+                  disabled={backlogGames.length < 2}
+                  onClick={() => {
+                    const otherGames = backlogGames.filter((game) => String(game.id) !== String(pickedBacklogGame.id));
+                    const pool = otherGames.length > 0 ? otherGames : backlogGames;
+                    const nextPick = pool[Math.floor(Math.random() * pool.length)];
+                    if (nextPick) setPickedBacklogId(String(nextPick.id));
+                  }}
+                  style={{
+                    backgroundColor: 'var(--panel-bg)',
+                    color: backlogGames.length < 2 ? 'var(--text)' : 'var(--text-h)',
+                    border: '1px solid var(--border)',
+                    borderRadius: '8px',
+                    padding: '9px 12px',
+                    fontSize: '0.8rem',
+                    fontWeight: '600',
+                    cursor: backlogGames.length < 2 ? 'not-allowed' : 'pointer',
+                    opacity: backlogGames.length < 2 ? 0.55 : 1
+                  }}
+                >
+                  Roll Again
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : backlogGames.length > 0 ? (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '14px',
+            padding: '18px',
+            backgroundColor: 'var(--bg)',
+            border: '1px dashed var(--border)',
+            borderRadius: '10px'
+          }}>
+            <p style={{ margin: 0, color: 'var(--text)', fontSize: '0.875rem', lineHeight: 1.6 }}>
+              Let SavePoint choose one of your {backlogGames.length} backlog {backlogGames.length === 1 ? 'game' : 'games'}.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                const pick = backlogGames[Math.floor(Math.random() * backlogGames.length)];
+                if (pick) setPickedBacklogId(String(pick.id));
+              }}
+              style={{
+                backgroundColor: 'var(--accent)',
+                color: 'var(--text-h)',
+                border: '1px solid var(--accent-border)',
+                borderRadius: '8px',
+                padding: '10px 14px',
+                fontSize: '0.85rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                boxShadow: 'var(--glow)'
+              }}
+            >
+              Pick a game
+            </button>
+          </div>
+        ) : (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '14px',
+            padding: '18px',
+            backgroundColor: 'var(--bg)',
+            border: '1px dashed var(--border)',
+            borderRadius: '10px'
+          }}>
+            <p style={{ margin: 0, color: 'var(--text)', fontSize: '0.875rem', lineHeight: 1.6 }}>
+              Your backlog is empty. Add games to your Library with Backlog status to use this picker.
+            </p>
+            <button
+              type="button"
+              onClick={() => { window.location.hash = 'discover'; }}
+              style={{
+                backgroundColor: 'transparent',
+                color: 'var(--text-h)',
+                border: '1px solid var(--border)',
+                borderRadius: '8px',
+                padding: '9px 12px',
+                fontSize: '0.8rem',
+                fontWeight: '700',
+                cursor: 'pointer'
+              }}
+            >
+              Discover games
+            </button>
+          </div>
+        )}
+      </section>
 
       <section style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
         <div style={{
