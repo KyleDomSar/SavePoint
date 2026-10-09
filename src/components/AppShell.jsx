@@ -254,7 +254,7 @@ const AppShell = ({ activeTab, setActiveTab, theme, onThemeChange, children }) =
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ width: '28px', height: '28px', backgroundColor: 'var(--accent)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyCenter: 'center', boxShadow: 'var(--glow)' }}>
+          <div style={{ width: '28px', height: '28px', backgroundColor: 'var(--accent)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--glow)' }}>
              <svg viewBox="0 0 24 24" fill="white" style={{ width: '16px', height: '16px', margin: '0 auto' }}>
               <path d="M21 7.25a.75.75 0 0 0-1.06 0l-1.2 1.2a.75.75 0 0 1-1.06-1.06l1.2-1.2a.75.75 0 0 0 0-1.06.75.75 0 0 0-1.06 0l-1.2 1.2a.75.75 0 0 1-1.06-1.06l1.2-1.2a.75.75 0 0 0-1.06-1.06L14 4.54a.75.75 0 0 0 0 1.06l1.2 1.2a.75.75 0 0 1-1.06 1.06l-1.2-1.2a.75.75 0 0 0-1.06 0 .75.75 0 0 0 0 1.06l1.2 1.2a.75.75 0 0 1-1.06 1.06l-1.2-1.2a.75.75 0 0 0-1.06 0L9 10.3l-1.12-1.12a2.25 2.25 0 0 0-3.18 0l-1.12 1.12a2.25 2.25 0 0 0 0 3.18l1.12 1.12a2.25 2.25 0 0 0 3.18 0L9 13.48v5.27a2.25 2.25 0 0 0 2.25 2.25h5.5a2.25 2.25 0 0 0 2.25-2.25v-5.27l1.12 1.12a2.25 2.25 0 0 0 3.18 0l1.12-1.12a2.25 2.25 0 0 0 0-3.18L21 7.25Z" />
             </svg>
@@ -302,6 +302,7 @@ const AppShell = ({ activeTab, setActiveTab, theme, onThemeChange, children }) =
             @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
           `}</style>
           <div
+            className="mobile-menu-drawer"
             ref={mobileMenuRef}
             onClick={(e) => e.stopPropagation()}
             style={{
