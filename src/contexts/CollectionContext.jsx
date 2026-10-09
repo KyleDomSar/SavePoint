@@ -64,6 +64,8 @@ export const CollectionProvider = ({ children }) => {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(collection));
     } catch (error) {
       console.error('SavePoint could not save the local collection:', error);
+      // Storage writes can fail synchronously in browsers with blocked or full storage.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStorageError('Changes are available for this session, but the browser could not save them. Check available storage and browser permissions.');
       // Stop retrying on every render after a quota or storage error.
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -79,6 +81,8 @@ export const CollectionProvider = ({ children }) => {
     const id = String(game.id);
     if (!game.title || typeof game.title !== 'string') return;
 
+    const requestedAt = Date.now();
+
     setCollection((previous) => {
       const existing = previous[id];
       return {
@@ -88,7 +92,7 @@ export const CollectionProvider = ({ children }) => {
           ...game,
           id,
           status,
-          addedAt: existing?.addedAt ?? Date.now()
+          addedAt: existing?.addedAt ?? requestedAt
         }
       };
     });
