@@ -16,12 +16,16 @@ const PAGE_SIZE = 20;
 const baseButtonStyle = {
   flex: 1,
   minWidth: 0,
+  minHeight: '36px',
   borderRadius: '6px',
-  padding: '8px 10px',
+  padding: '8px 5px',
   fontSize: '0.75rem',
+  lineHeight: 1.25,
   fontWeight: '700',
   cursor: 'pointer',
-  whiteSpace: 'nowrap',
+  whiteSpace: 'normal',
+  textAlign: 'center',
+  overflowWrap: 'anywhere',
   transition: 'opacity 0.2s ease, border-color 0.2s ease'
 };
 
