@@ -107,46 +107,84 @@ const CollectionToolbar = ({
         flexShrink: 0
       }}>
         {platforms.length > 1 && (
-          <select
-            value={platformFilter}
-            onChange={(event) => onPlatformFilterChange?.(event.target.value)}
-            aria-label="Filter by platform"
-            style={{
-              maxWidth: '170px',
-              minWidth: 0,
-              backgroundColor: 'var(--bg)',
-              border: '1px solid var(--border)',
-              color: 'var(--text-h)',
-              borderRadius: '8px',
-              padding: '10px 10px',
-              fontSize: '0.8rem',
-              cursor: 'pointer'
-            }}
-          >
-            <option value="">All platforms</option>
-            {platforms.map((platform) => <option key={platform} value={platform}>{platform}</option>)}
-          </select>
+          <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', minWidth: 0, maxWidth: '170px' }}>
+            <select
+              value={platformFilter}
+              onChange={(event) => onPlatformFilterChange?.(event.target.value)}
+              aria-label="Filter by platform"
+              style={{
+                appearance: 'none',
+                WebkitAppearance: 'none',
+                width: '100%',
+                minWidth: 0,
+                maxWidth: '170px',
+                backgroundColor: 'var(--bg)',
+                border: '1px solid var(--border)',
+                color: 'var(--text-h)',
+                borderRadius: '8px',
+                padding: '10px 30px 10px 10px',
+                fontSize: '0.8rem',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="">All platforms</option>
+              {platforms.map((platform) => <option key={platform} value={platform}>{platform}</option>)}
+            </select>
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              style={{ position: 'absolute', right: '9px', color: 'var(--text)', pointerEvents: 'none' }}
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </div>
         )}
         {genres.length > 1 && (
-          <select
-            value={genreFilter}
-            onChange={(event) => onGenreFilterChange?.(event.target.value)}
-            aria-label="Filter by genre"
-            style={{
-              maxWidth: '170px',
-              minWidth: 0,
-              backgroundColor: 'var(--bg)',
-              border: '1px solid var(--border)',
-              color: 'var(--text-h)',
-              borderRadius: '8px',
-              padding: '10px 10px',
-              fontSize: '0.8rem',
-              cursor: 'pointer'
-            }}
-          >
-            <option value="">All genres</option>
-            {genres.map((genre) => <option key={genre} value={genre}>{genre}</option>)}
-          </select>
+          <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', minWidth: 0, maxWidth: '170px' }}>
+            <select
+              value={genreFilter}
+              onChange={(event) => onGenreFilterChange?.(event.target.value)}
+              aria-label="Filter by genre"
+              style={{
+                appearance: 'none',
+                WebkitAppearance: 'none',
+                width: '100%',
+                minWidth: 0,
+                maxWidth: '170px',
+                backgroundColor: 'var(--bg)',
+                border: '1px solid var(--border)',
+                color: 'var(--text-h)',
+                borderRadius: '8px',
+                padding: '10px 30px 10px 10px',
+                fontSize: '0.8rem',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="">All genres</option>
+              {genres.map((genre) => <option key={genre} value={genre}>{genre}</option>)}
+            </select>
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              style={{ position: 'absolute', right: '9px', color: 'var(--text)', pointerEvents: 'none' }}
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </div>
         )}
         {hasFilters && (
           <button
