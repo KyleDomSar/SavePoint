@@ -34,10 +34,13 @@ const FilterBar = ({ activeFilters, onFiltersChange }) => {
     return () => { cancelled = true; };
   }, []);
 
+  const parseSelectedIds = (value) =>
+    (typeof value === 'string' ? value.split(',').filter(Boolean) : []).map(Number);
+
   const toggleGenre = (id) => {
-    const next = new Set(activeFilters.genres || []);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
+    const next = new Set(parseSelectedIds(activeFilters.genres));
+    if (next.has(Number(id))) next.delete(Number(id));
+    else next.add(Number(id));
     onFiltersChange({
       ...activeFilters,
       genres: Array.from(next).join(',')
@@ -45,9 +48,9 @@ const FilterBar = ({ activeFilters, onFiltersChange }) => {
   };
 
   const togglePlatform = (id) => {
-    const next = new Set(activeFilters.platforms || []);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
+    const next = new Set(parseSelectedIds(activeFilters.platforms));
+    if (next.has(Number(id))) next.delete(Number(id));
+    else next.add(Number(id));
     onFiltersChange({
       ...activeFilters,
       platforms: Array.from(next).join(',')
@@ -74,9 +77,7 @@ const FilterBar = ({ activeFilters, onFiltersChange }) => {
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
         <span style={{ fontSize: '0.825rem', color: 'var(--text)', fontWeight: '600', marginRight: '4px' }}>Genres:</span>
         {genreList.map((genre) => {
-          const isActive = activeFilters.genres
-            ? activeFilters.genres.split(',').map(Number).includes(Number(genre.id))
-            : false;
+          const isActive = parseSelectedIds(activeFilters.genres).includes(Number(genre.id));
           return (
             <button
               key={genre.id}
@@ -104,9 +105,7 @@ const FilterBar = ({ activeFilters, onFiltersChange }) => {
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
         <span style={{ fontSize: '0.825rem', color: 'var(--text)', fontWeight: '600', marginRight: '4px' }}>Platforms:</span>
         {platformList.map((platform) => {
-          const isActive = activeFilters.platforms
-            ? activeFilters.platforms.split(',').map(Number).includes(Number(platform.id))
-            : false;
+          const isActive = parseSelectedIds(activeFilters.platforms).includes(Number(platform.id));
           return (
             <button
               key={platform.id}
