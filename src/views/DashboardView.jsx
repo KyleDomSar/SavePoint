@@ -33,7 +33,8 @@ const DashboardView = () => {
   };
 
   const handleImportBackup = async (event) => {
-    const file = event.currentTarget.files?.[0];
+    const input = event.currentTarget;
+    const file = input.files?.[0];
     if (!file) return;
 
     try {
@@ -75,7 +76,7 @@ const DashboardView = () => {
         text: 'Could not read this backup file. Make sure it is valid JSON. Your collection was not changed.'
       });
     } finally {
-      event.currentTarget.value = '';
+      input.value = '';
     }
   };
 
