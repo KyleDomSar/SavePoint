@@ -102,11 +102,21 @@ export const CollectionProvider = ({ children }) => {
 
     setCollection((previous) => {
       const stringId = String(id);
-      if (!previous[stringId] || previous[stringId].status === status) return previous;
+      const existing = previous[stringId];
+      if (!existing || existing.status === status) return previous;
+
+      const nextGame = { ...existing, status };
+      if (status === 'completed') {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        nextGame.completedAt = `${year}-${month}-${day}`;
+      }
 
       return {
         ...previous,
-        [stringId]: { ...previous[stringId], status }
+        [stringId]: nextGame
       };
     });
   }, []);
