@@ -159,6 +159,78 @@ export const CollectionProvider = ({ children }) => {
     });
   }, []);
 
+  const importCollection = useCallback((games) => {
+    if (!Array.isArray(games)) {
+      return { success: false, message: 'The backup does not contain a valid games list.' };
+    }
+
+    if (games.length > 10000) {
+      return { success: false, message: 'This backup contains too many games to import safely.' };
+    }
+
+    const importedGames = {};
+    for (const game of games) {
+      if (
+        !game ||
+        typeof game !== 'object' ||
+        Array.isArray(game) ||
+        (typeof game.id !== 'string' && typeof game.id !== 'number') ||
+        !/^\\d+$/.test(String(game.id)) ||
+        !game.title ||
+        typeof game.title !== 'string' ||
+        !VALID_STATUSES.includes(game.status)
+      ) {
+        return { success: false, message: 'The backup has an invalid game entry. Nothing was imported.' };
+      }
+
+      if (
+        game.personalRating !== undefined &&
+        game.personalRating !== null &&
+        (!Number.isInteger(game.personalRating) || game.personalRating < 1 || game.personalRating > 5)
+      ) {
+        return { success: false, message: `The saved rating for "${game.title}" is invalid. Nothing was imported.` };
+      }
+
+      if (
+        game.playtimePlayed !== undefined &&
+        game.playtimePlayed !== null &&
+        (typeof game.playtimePlayed !== 'number' || !Number.isFinite(game.playtimePlayed) || game.playtimePlayed < 0 || game.playtimePlayed > 100000)
+      ) {
+        return { success: false, message: `The saved playtime for "${game.title}" is invalid. Nothing was imported.` };
+      }
+
+      if (game.personalNotes !== undefined && typeof game.personalNotes !== 'string') {
+        return { success: false, message: `The saved notes for "${game.title}" are invalid. Nothing was imported.` };
+      }
+
+      const id = String(game.id);
+      importedGames[id] = {
+        ...game,
+        id,
+        title: game.title.trim(),
+        personalNotes: typeof game.personalNotes === 'string' ? game.personalNotes.slice(0, 2000) : ''
+      };
+      if (!importedGames[id].title) {
+        return { success: false, message: 'The backup contains a game with an empty title. Nothing was imported.' };
+      }
+    }
+
+    const added = Object.keys(importedGames).filter((id) => !collection[id]).length;
+    const updated = Object.keys(importedGames).length - added;
+
+    setCollection((previous) => {
+      const next = { ...previous };
+      for (const [id, game] of Object.entries(importedGames)) {
+        // Imported records restore their progress fields, while unknown fields
+        // already saved locally are preserved by merging the two records.
+        next[id] = { ...(previous[id] || {}), ...game, id };
+      }
+      return next;
+    });
+
+    return { success: true, added, updated, count: Object.keys(importedGames).length };
+  }, [collection]);
+
   const value = {
     collection,
     items: Object.values(collection),
@@ -167,7 +239,8 @@ export const CollectionProvider = ({ children }) => {
     addGame,
     updateGameStatus,
     updateGameProgress,
-    removeGame
+    removeGame,
+    importCollection
   };
 
   return (
