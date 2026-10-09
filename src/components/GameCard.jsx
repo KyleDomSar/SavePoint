@@ -3,12 +3,26 @@ import { StarIcon, ClockIcon } from './Icons';
 import GameDetailsModal from './GameDetailsModal';
 import GameProgressModal from './GameProgressModal';
 
+const formatCompletedDate = (value) => {
+  if (typeof value !== 'string' || !/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return null;
+
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return null;
+
+  return date.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
 const GameCard = ({
   id,
   title,
   platform,
   coverUrl,
   status,
+  completedAt,
   playtime,
   rating,
   releaseDate,
@@ -64,6 +78,7 @@ const GameCard = ({
   };
 
   const statusStyle = getStatusStyle(status);
+  const completedDateLabel = status === 'completed' ? formatCompletedDate(completedAt) : null;
 
   return (
     <>
@@ -225,6 +240,23 @@ const GameCard = ({
               fontWeight: '400'
             }}>
               {releaseDate}
+            </span>
+          )}
+          {completedDateLabel && (
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              alignSelf: 'flex-start',
+              maxWidth: '100%',
+              padding: '3px 7px',
+              borderRadius: '5px',
+              border: '1px solid rgba(16, 185, 129, 0.35)',
+              backgroundColor: 'rgba(16, 185, 129, 0.08)',
+              color: '#34d399',
+              fontSize: '0.7rem',
+              lineHeight: 1.4
+            }}>
+              Completed {completedDateLabel}
             </span>
           )}
           {id !== undefined && id !== null && (
