@@ -189,21 +189,31 @@ const AppShell = ({ activeTab, setActiveTab, children }) => {
         </nav>
 
         {/* Sidebar Footer / Collapse Toggler */}
-        <div style={{ padding: '16px', borderTop: '1px solid var(--border)' }}>
+        <div style={{
+          padding: isSidebarCollapsed ? '12px' : '16px',
+          borderTop: '1px solid var(--border)',
+          display: 'flex',
+          justifyContent: isSidebarCollapsed ? 'center' : 'flex-start'
+        }}>
           <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            aria-label={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '12px',
-              width: '100%',
-              padding: '10px',
+              justifyContent: 'center',
+              gap: '8px',
+              width: isSidebarCollapsed ? '40px' : 'auto',
+              height: '40px',
+              padding: isSidebarCollapsed ? '0' : '0 10px',
               borderRadius: '8px',
               border: '1px solid var(--border)',
               backgroundColor: 'transparent',
               color: 'var(--text)',
               cursor: 'pointer',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              whiteSpace: 'nowrap'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = 'var(--border-focus)';
@@ -215,7 +225,7 @@ const AppShell = ({ activeTab, setActiveTab, children }) => {
             }}
           >
             <CollapseIcon collapsed={isSidebarCollapsed} />
-            {!isSidebarCollapsed && <span style={{ fontSize: '0.875rem' }}>Collapse Sidebar</span>}
+            {!isSidebarCollapsed && <span style={{ fontSize: '0.8rem' }}>Collapse</span>}
           </button>
         </div>
       </aside>
