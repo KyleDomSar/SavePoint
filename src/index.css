@@ -1,18 +1,19 @@
 :root {
-  --bg: #0a0b0d;
-  --panel-bg: #14151a;
-  --panel-hover: #1c1d26;
-  --border: #21232c;
-  --border-focus: #3b3e4f;
-  --text: #9ca3af;
-  --text-h: #f3f4f6;
+  /* SavePoint "Aqua Reactor" palette: graphite surfaces with teal-mint accents. */
+  --bg: #080f11;
+  --panel-bg: #101b1e;
+  --panel-hover: #17272b;
+  --border: #203438;
+  --border-focus: #36585d;
+  --text: #a0b8ba;
+  --text-h: #effcfb;
   --text-white: #ffffff;
-  --accent: #8b5cf6;
-  --accent-hover: #a78bfa;
-  --accent-bg: rgba(139, 92, 246, 0.1);
-  --accent-border: rgba(139, 92, 246, 0.4);
-  --shadow: rgba(0, 0, 0, 0.5) 0 10px 15px -3px, rgba(0, 0, 0, 0.3) 0 4px 6px -2px;
-  --glow: 0 0 15px rgba(139, 92, 246, 0.25);
+  --accent: #0f766e;
+  --accent-hover: #2dd4bf;
+  --accent-bg: rgba(45, 212, 191, 0.1);
+  --accent-border: rgba(45, 212, 191, 0.42);
+  --shadow: rgba(0, 0, 0, 0.52) 0 10px 15px -3px, rgba(0, 0, 0, 0.32) 0 4px 6px -2px;
+  --glow: 0 0 18px rgba(45, 212, 191, 0.2);
 
   --sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --heading: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
