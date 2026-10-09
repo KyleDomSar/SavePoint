@@ -95,7 +95,7 @@ const LibraryView = () => {
     });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', width: '100%' }}>
+    <div className="collection-view library-view" style={{ display: 'flex', flexDirection: 'column', gap: '32px', width: '100%' }}>
       <PageHeader
         title="My Library"
         description="Manage your collection and update each game's status as you play."
@@ -163,8 +163,8 @@ const LibraryView = () => {
         const games = libraryGames.filter((game) => game.status === section.status);
 
         return (
-          <section key={section.status} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <section key={section.status} className="library-section" style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
+            <div className="collection-section-heading" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
               <h2 style={{ fontSize: '1.25rem', color: 'var(--text-h)', margin: 0 }}>{section.title}</h2>
               <span style={{
                 backgroundColor: 'var(--border)',
@@ -179,7 +179,7 @@ const LibraryView = () => {
             </div>
 
             {games.length > 0 ? (
-              <div style={{
+              <div className="game-grid" style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
                 gap: '16px'
