@@ -8,8 +8,9 @@ import {
   HamburgerIcon,
   CloseIcon
 } from './Icons';
+import ThemeSelector from './ThemeSelector.jsx';
 
-const AppShell = ({ activeTab, setActiveTab, children }) => {
+const AppShell = ({ activeTab, setActiveTab, theme, onThemeChange, children }) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef(null);
@@ -194,8 +195,11 @@ const AppShell = ({ activeTab, setActiveTab, children }) => {
           padding: isSidebarCollapsed ? '12px' : '16px',
           borderTop: '1px solid var(--border)',
           display: 'flex',
-          justifyContent: isSidebarCollapsed ? 'center' : 'flex-start'
+          flexDirection: 'column',
+          alignItems: isSidebarCollapsed ? 'center' : 'stretch',
+          gap: '12px'
         }}>
+          <ThemeSelector theme={theme} onThemeChange={onThemeChange} compact={isSidebarCollapsed} />
           <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             aria-label={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -349,6 +353,9 @@ const AppShell = ({ activeTab, setActiveTab, children }) => {
                 </button>
               ))}
             </nav>
+            <div style={{ marginTop: 'auto', padding: '16px', borderTop: '1px solid var(--border)' }}>
+              <ThemeSelector theme={theme} onThemeChange={onThemeChange} />
+            </div>
           </div>
         </div>
       )}
