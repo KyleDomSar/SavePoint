@@ -70,6 +70,7 @@ const ThemeSelector = ({ theme, onThemeChange, compact = false }) => {
 
       {isOpen && (
         <div
+          className="theme-selector-popover"
           id={panelId}
           role="group"
           aria-label="Choose a color theme"
