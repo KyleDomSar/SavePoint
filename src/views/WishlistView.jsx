@@ -114,8 +114,8 @@ const WishlistView = () => {
       {wishlistGames.length > 0 ? (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-          gap: '24px'
+          gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+          gap: '16px'
         }}>
           {wishlistGames.map((game) => (
             <GameCard
