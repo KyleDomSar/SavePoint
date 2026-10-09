@@ -32,6 +32,76 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+
+/* SavePoint theme presets. Every palette uses the same semantic variables. */
+:root[data-theme="crimson"] {
+  --bg: #12090c;
+  --panel-bg: #211116;
+  --panel-hover: #321820;
+  --border: #49232c;
+  --border-focus: #713541;
+  --text: #d7aeb7;
+  --text-h: #fff1f3;
+  --text-white: #ffffff;
+  --accent: #be123c;
+  --accent-hover: #fb7185;
+  --accent-bg: rgba(251, 113, 133, 0.1);
+  --accent-border: rgba(251, 113, 133, 0.42);
+  --shadow: rgba(0, 0, 0, 0.52) 0 10px 15px -3px, rgba(0, 0, 0, 0.32) 0 4px 6px -2px;
+  --glow: 0 0 18px rgba(251, 113, 133, 0.18);
+}
+
+:root[data-theme="solar"] {
+  --bg: #110e07;
+  --panel-bg: #21190c;
+  --panel-hover: #32250f;
+  --border: #493617;
+  --border-focus: #72531f;
+  --text: #d4bd91;
+  --text-h: #fff8e6;
+  --text-white: #ffffff;
+  --accent: #b45309;
+  --accent-hover: #fbbf24;
+  --accent-bg: rgba(251, 191, 36, 0.1);
+  --accent-border: rgba(251, 191, 36, 0.42);
+  --shadow: rgba(0, 0, 0, 0.52) 0 10px 15px -3px, rgba(0, 0, 0, 0.32) 0 4px 6px -2px;
+  --glow: 0 0 18px rgba(251, 191, 36, 0.17);
+}
+
+:root[data-theme="violet"] {
+  --bg: #0e0a17;
+  --panel-bg: #191226;
+  --panel-hover: #261a39;
+  --border: #38274e;
+  --border-focus: #5d3e7d;
+  --text: #c0aed5;
+  --text-h: #f7f0ff;
+  --text-white: #ffffff;
+  --accent: #7e22ce;
+  --accent-hover: #c084fc;
+  --accent-bg: rgba(192, 132, 252, 0.1);
+  --accent-border: rgba(192, 132, 252, 0.42);
+  --shadow: rgba(0, 0, 0, 0.54) 0 10px 15px -3px, rgba(0, 0, 0, 0.34) 0 4px 6px -2px;
+  --glow: 0 0 18px rgba(192, 132, 252, 0.18);
+}
+
+:root[data-theme="arctic"] {
+  --bg: #08111b;
+  --panel-bg: #101f30;
+  --panel-hover: #192d41;
+  --border: #254158;
+  --border-focus: #3b6686;
+  --text: #a8c3d9;
+  --text-h: #f0f8ff;
+  --text-white: #ffffff;
+  --accent: #0369a1;
+  --accent-hover: #38bdf8;
+  --accent-bg: rgba(56, 189, 248, 0.1);
+  --accent-border: rgba(56, 189, 248, 0.42);
+  --shadow: rgba(0, 0, 0, 0.5) 0 10px 15px -3px, rgba(0, 0, 0, 0.3) 0 4px 6px -2px;
+  --glow: 0 0 18px rgba(56, 189, 248, 0.18);
+}
+
 body {
   margin: 0;
   padding: 0;
