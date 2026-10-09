@@ -767,7 +767,7 @@ const DashboardView = () => {
         </div>
 
         {recentCompletedGames.length > 0 ? (
-          <div style={{
+          <div className="game-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
             gap: '16px',
