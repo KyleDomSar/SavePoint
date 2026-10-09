@@ -62,7 +62,7 @@ const WishlistView = () => {
     });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
+    <div className="collection-view wishlist-view" style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
       <PageHeader
         title="Wishlist"
         description="Keep track of games you want to play and move them to your library when you're ready."
@@ -112,7 +112,7 @@ const WishlistView = () => {
       </div>
 
       {wishlistGames.length > 0 ? (
-        <div style={{
+        <div className="game-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
           gap: '16px'
