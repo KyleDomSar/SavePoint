@@ -3,7 +3,7 @@
 
 const LoadingSkeleton = ({ count = 6 }) => {
   return (
-    <div style={{
+    <div className="game-grid loading-skeleton-grid" style={{
       display: 'grid',
       gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
       gap: '16px'
