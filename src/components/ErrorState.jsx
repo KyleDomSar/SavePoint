@@ -3,7 +3,7 @@
 
 const ErrorState = ({ message, onRetry }) => {
   return (
-    <div style={{
+    <div className="error-state" style={{
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
