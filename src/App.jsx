@@ -5,8 +5,18 @@ import DiscoverView from './views/DiscoverView';
 import LibraryView from './views/LibraryView';
 import WishlistView from './views/WishlistView';
 import { CollectionProvider } from './contexts/CollectionContext.jsx';
+import { DEFAULT_THEME, THEME_STORAGE_KEY, THEMES } from './themes.js';
 
 const VALID_TABS = ['dashboard', 'discover', 'library', 'wishlist'];
+
+function readSavedTheme() {
+  try {
+    const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+    return THEMES.some((theme) => theme.id === savedTheme) ? savedTheme : DEFAULT_THEME;
+  } catch {
+    return DEFAULT_THEME;
+  }
+}
 
 function getTabFromHash() {
   const tab = window.location.hash.slice(1);
@@ -15,6 +25,17 @@ function getTabFromHash() {
 
 function App() {
   const [activeTab, setActiveTabState] = useState(getTabFromHash);
+  const [activeTheme, setActiveTheme] = useState(readSavedTheme);
+
+  // Apply the selected palette globally and remember it for the next visit.
+  useEffect(() => {
+    document.documentElement.dataset.theme = activeTheme;
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, activeTheme);
+    } catch {
+      // The current session still uses the selected theme if storage is unavailable.
+    }
+  }, [activeTheme]);
 
   // Keep the visible tab in sync when users use browser Back/Forward.
   useEffect(() => {
@@ -53,7 +74,7 @@ function App() {
 
   return (
     <CollectionProvider>
-      <AppShell activeTab={activeTab} setActiveTab={setActiveTab}>
+      <AppShell activeTab={activeTab} setActiveTab={setActiveTab} theme={activeTheme} onThemeChange={setActiveTheme}>
         {renderActiveView()}
       </AppShell>
     </CollectionProvider>
