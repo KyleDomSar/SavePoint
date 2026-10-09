@@ -97,7 +97,7 @@ const SearchBar = ({ value, onChange, placeholder = 'Search for games...' }) => 
         }}
         onFocus={(e) => {
           e.currentTarget.style.borderColor = 'var(--accent-border)';
-          e.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.15)';
+          e.currentTarget.style.boxShadow = 'var(--glow)';
         }}
         onBlur={(e) => {
           e.currentTarget.style.borderColor = 'var(--border)';
