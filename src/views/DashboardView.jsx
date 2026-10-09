@@ -16,7 +16,7 @@ const COMPLETION_MILESTONES = [
 ];
 
 const DashboardView = () => {
-  const { items, storageError, importCollection, updateGameStatus } = useCollection();
+  const { items, storageError, importCollection, updateGameStatus, updateGameProgress } = useCollection();
   const [pickedBacklogId, setPickedBacklogId] = useState(null);
   const backupInputRef = useRef(null);
   const [backupMessage, setBackupMessage] = useState(null);
@@ -856,7 +856,16 @@ const DashboardView = () => {
               gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
               gap: '16px'
             }}>
-              {playingGames.map((game) => <GameCard key={game.id} {...game} />)}
+              {playingGames.map((game) => (
+                <GameCard
+                  key={game.id}
+                  {...game}
+                  personalPlaytime={game.playtimePlayed}
+                  personalRating={game.personalRating}
+                  personalNotes={game.personalNotes}
+                  onSaveProgress={(progress) => updateGameProgress(game.id, progress)}
+                />
+              ))}
             </div>
           ) : (
             <div style={{
