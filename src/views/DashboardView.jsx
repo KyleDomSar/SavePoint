@@ -132,7 +132,7 @@ const DashboardView = () => {
     : '0.0%';
 
   const statusBreakdown = [
-    { status: 'playing', label: 'Playing', count: items.filter((game) => game.status === 'playing').length, color: '#2dd4bf' },
+    { status: 'playing', label: 'Playing', count: items.filter((game) => game.status === 'playing').length, color: 'var(--accent-hover)' },
     { status: 'backlog', label: 'Backlog', count: items.filter((game) => game.status === 'backlog').length, color: '#9ca3af' },
     { status: 'completed', label: 'Completed', count: items.filter((game) => game.status === 'completed').length, color: '#10b981' },
     { status: 'wishlist', label: 'Wishlist', count: wishlistCount, color: '#ec4899' }
