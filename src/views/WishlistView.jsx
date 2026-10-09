@@ -1,13 +1,41 @@
+import { useState } from 'react';
 import PageHeader from '../components/PageHeader';
 import GameCard from '../components/GameCard';
 import EmptyState from '../components/EmptyState';
+import CollectionToolbar from '../components/CollectionToolbar';
 import { useCollection } from '../contexts/useCollection';
 
 const WishlistView = () => {
   const { items, updateGameStatus, removeGame, storageError } = useCollection();
-  const wishlistGames = items
-    .filter((game) => game.status === 'wishlist')
-    .sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('recent');
+  const allWishlistGames = items.filter((game) => game.status === 'wishlist');
+  const query = searchTerm.trim().toLocaleLowerCase();
+
+  const wishlistGames = allWishlistGames
+    .filter((game) => {
+      const genreText = Array.isArray(game.genres)
+        ? game.genres.map((genre) => typeof genre === 'string' ? genre : genre?.name || '').join(' ')
+        : '';
+      const searchableText = [game.title, game.platform, genreText]
+        .filter(Boolean)
+        .join(' ')
+        .toLocaleLowerCase();
+      return searchableText.includes(query);
+    })
+    .sort((a, b) => {
+      const addedDifference = (Number(b.addedAt) || 0) - (Number(a.addedAt) || 0);
+      if (sortBy === 'title') {
+        return String(a.title || '').localeCompare(String(b.title || ''), undefined, { sensitivity: 'base' });
+      }
+      if (sortBy === 'rating') {
+        return ((Number(b.personalRating) || 0) - (Number(a.personalRating) || 0)) || addedDifference;
+      }
+      if (sortBy === 'playtime') {
+        return ((Number(b.playtimePlayed) || 0) - (Number(a.playtimePlayed) || 0)) || addedDifference;
+      }
+      return addedDifference;
+    });
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
@@ -29,6 +57,16 @@ const WishlistView = () => {
           {storageError}
         </div>
       )}
+
+      <CollectionToolbar
+        searchTerm={searchTerm}
+        onSearchTermChange={setSearchTerm}
+        sortBy={sortBy}
+        onSortByChange={setSortBy}
+        resultCount={wishlistGames.length}
+        totalCount={allWishlistGames.length}
+        itemLabel="games"
+      />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
         <h2 style={{ fontSize: '1.25rem', color: 'var(--text-h)', margin: 0 }}>
@@ -91,6 +129,29 @@ const WishlistView = () => {
               }
             />
           ))}
+        </div>
+      ) : query && allWishlistGames.length > 0 ? (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+          <EmptyState
+            title="No matching games"
+            description={`No games in your wishlist match "${searchTerm.trim()}". Try another title, platform, or genre.`}
+          />
+          <button
+            type="button"
+            onClick={() => setSearchTerm('')}
+            style={{
+              backgroundColor: 'var(--accent-bg)',
+              border: '1px solid var(--accent-border)',
+              color: 'var(--text-h)',
+              borderRadius: '8px',
+              padding: '9px 14px',
+              fontSize: '0.8rem',
+              fontWeight: '700',
+              cursor: 'pointer'
+            }}
+          >
+            Clear search
+          </button>
         </div>
       ) : (
         <EmptyState
