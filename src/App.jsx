@@ -4,7 +4,7 @@ import DashboardView from './views/DashboardView';
 import DiscoverView from './views/DiscoverView';
 import LibraryView from './views/LibraryView';
 import WishlistView from './views/WishlistView';
-import { CollectionProvider } from './contexts/CollectionContext';
+import { CollectionProvider } from './contexts/CollectionContext.jsx';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
