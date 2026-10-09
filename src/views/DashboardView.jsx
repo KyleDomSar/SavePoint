@@ -701,8 +701,8 @@ const DashboardView = () => {
         {recentGames.length > 0 ? (
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-            gap: '20px',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+            gap: '16px',
             width: '100%'
           }}>
             {recentGames.map((game) => (
@@ -769,8 +769,8 @@ const DashboardView = () => {
         {recentCompletedGames.length > 0 ? (
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-            gap: '20px',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+            gap: '16px',
             width: '100%'
           }}>
             {recentCompletedGames.map((game) => (
@@ -853,8 +853,8 @@ const DashboardView = () => {
           {playingGames.length > 0 ? (
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '20px'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+              gap: '16px'
             }}>
               {playingGames.map((game) => <GameCard key={game.id} {...game} />)}
             </div>
