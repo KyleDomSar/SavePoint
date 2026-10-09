@@ -170,7 +170,7 @@ const GameCard = ({
 
         {/* Status Badge */}
         {status && (
-          <div style={{
+          <div className="game-card-status" style={{
             position: 'absolute',
             top: '12px',
             right: '12px',
@@ -191,7 +191,7 @@ const GameCard = ({
 
         {/* Platform tag (bottom left) */}
         {platform && (
-          <div style={{
+          <div className="game-card-platform-tag" style={{
             position: 'absolute',
             bottom: '12px',
             left: '12px',
