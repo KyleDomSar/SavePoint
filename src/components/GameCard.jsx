@@ -347,7 +347,7 @@ const GameCard = ({
     {showProgressEditor && onSaveProgress && (
       <GameProgressModal
         key={id}
-        game={{ id, title, playtimePlayed, personalRating, personalNotes }}
+        game={{ id, title, playtimePlayed: personalPlaytime, personalRating, personalNotes }}
         onClose={() => setShowProgressEditor(false)}
         onSave={onSaveProgress}
       />
