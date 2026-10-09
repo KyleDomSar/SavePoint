@@ -213,11 +213,11 @@ const GameCard = ({
 
       {/* Info Area */}
       <div style={{
-        padding: '16px',
+        padding: '12px',
         display: 'flex',
         flexDirection: 'column',
         flexGrow: 1,
-        gap: '12px',
+        gap: '10px',
         justifyContent: 'space-between'
       }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
