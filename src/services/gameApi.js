@@ -70,14 +70,32 @@ export function normalizeGame(raw = {}) {
 
 async function requestJson(url, signal) {
   const response = await fetch(url, { signal });
-  if (!response.ok) {
-    const body = await safeJson(response);
-    const err = new Error(body?.error || `Request failed with status ${response.status}`);
-    err.code = body?.code || 'REQUEST_FAILED';
+  const responseText = await response.text();
+
+  let data;
+  try {
+    data = JSON.parse(responseText);
+  } catch {
+    const requestUrl = new URL(response.url || url, window.location.origin);
+    const isLocalDev = ['localhost', '127.0.0.1', '::1'].includes(requestUrl.hostname);
+    const message = isLocalDev
+      ? 'The local Vite server does not run SavePoint’s Vercel API functions. Stop the current dev server and run "vercel dev" from the project folder instead.'
+      : 'The catalog API returned a non-JSON page instead of game data. Vercel Deployment Protection may be intercepting the API request. Check the project’s Settings > Deployment Protection, then refresh the app.';
+
+    const err = new Error(message);
+    err.code = 'NON_JSON_RESPONSE';
     err.status = response.status;
     throw err;
   }
-  return response.json();
+
+  if (!response.ok) {
+    const err = new Error(data?.error || `Request failed with status ${response.status}`);
+    err.code = data?.code || 'REQUEST_FAILED';
+    err.status = response.status;
+    throw err;
+  }
+
+  return data;
 }
 
 async function safeJson(response) {
