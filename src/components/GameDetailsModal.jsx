@@ -143,6 +143,7 @@ const GameDetailsModal = ({ game, onClose }) => {
     <div
       role="presentation"
       onClick={onClose}
+      className="game-details-backdrop"
       style={{
         position: 'fixed',
         inset: 0,
@@ -156,13 +157,14 @@ const GameDetailsModal = ({ game, onClose }) => {
       }}
     >
       <section
+        className="game-details-panel"
         role="dialog"
         aria-modal="true"
         aria-labelledby={`game-details-title-${game.id}`}
         onClick={(event) => event.stopPropagation()}
         style={panelStyle}
       >
-        <header style={{
+        <header className="game-details-header" style={{
           position: 'sticky',
           top: 0,
           zIndex: 2,
@@ -206,7 +208,7 @@ const GameDetailsModal = ({ game, onClose }) => {
         </header>
 
         {details.coverUrl ? (
-          <div style={{ height: '210px', backgroundColor: 'var(--bg)', overflow: 'hidden' }}>
+          <div className="game-details-cover" style={{ height: '210px', backgroundColor: 'var(--bg)', overflow: 'hidden' }}>
             <img
               src={details.coverUrl}
               alt={`${details.title || game.title} artwork`}
@@ -230,7 +232,7 @@ const GameDetailsModal = ({ game, onClose }) => {
           </div>
         )}
 
-        <div style={{ padding: '22px', display: 'flex', flexDirection: 'column', gap: '22px' }}>
+        <div className="game-details-body" style={{ padding: '22px', display: 'flex', flexDirection: 'column', gap: '22px' }}>
           {isLoading && (
             <p role="status" style={{ margin: 0, color: 'var(--text)', fontSize: '0.85rem' }}>
               Loading additional details…
