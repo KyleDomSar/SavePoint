@@ -98,13 +98,6 @@ async function requestJson(url, signal) {
   return data;
 }
 
-async function safeJson(response) {
-  try {
-    return await response.json();
-  } catch {
-    return null;
-  }
-}
 
 // Fetch a paginated list of games. Supports search, genre/platform filters,
 // ordering, and pagination. `signal` may be used to cancel in-flight requests.
