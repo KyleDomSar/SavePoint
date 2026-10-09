@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import PageHeader from '../components/PageHeader';
 import StatCard from '../components/StatCard';
 import GameCard from '../components/GameCard';
+import EmptyState from '../components/EmptyState';
 import { GamepadIcon, TrophyIcon, WishlistIcon, ClockIcon, StarIcon } from '../components/Icons';
 import { useCollection } from '../contexts/useCollection';
 
@@ -85,6 +86,9 @@ const DashboardView = () => {
   const wishlistCount = items.filter((game) => game.status === 'wishlist').length;
   const completedCount = libraryGames.filter((game) => game.status === 'completed').length;
   const playingGames = libraryGames.filter((game) => game.status === 'playing');
+  const recentGames = [...items]
+    .sort((a, b) => (Number(b.addedAt) || 0) - (Number(a.addedAt) || 0))
+    .slice(0, 4);
   const ratedGames = libraryGames.filter((game) => Number.isInteger(game.personalRating) && game.personalRating >= 1 && game.personalRating <= 5);
   const averagePersonalRating = ratedGames.length
     ? `${(ratedGames.reduce((total, game) => total + game.personalRating, 0) / ratedGames.length).toFixed(1)} / 5`
@@ -122,6 +126,76 @@ const DashboardView = () => {
       }}>
         {stats.map((stat) => <StatCard key={stat.title} {...stat} />)}
       </div>
+
+      <section style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <h2 style={{ fontSize: '1.25rem', color: 'var(--text-h)', margin: 0 }}>Recently Added</h2>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text)', margin: 0 }}>
+              Your latest saved games across Library and Wishlist.
+            </p>
+          </div>
+          {recentGames.length > 0 && (
+            <span style={{
+              color: 'var(--text)',
+              fontSize: '0.75rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.04em'
+            }}>
+              Latest {recentGames.length} {recentGames.length === 1 ? 'game' : 'games'}
+            </span>
+          )}
+        </div>
+
+        {recentGames.length > 0 ? (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+            gap: '20px',
+            width: '100%'
+          }}>
+            {recentGames.map((game) => (
+              <GameCard
+                key={game.id}
+                {...game}
+                actionButton={(
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.location.hash = game.status === 'wishlist' ? 'wishlist' : 'library';
+                    }}
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      backgroundColor: 'var(--bg)',
+                      color: 'var(--text-h)',
+                      border: '1px solid var(--border)',
+                      borderRadius: '7px',
+                      padding: '8px 10px',
+                      fontSize: '0.75rem',
+                      fontWeight: '700',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {game.status === 'wishlist' ? 'Open Wishlist' : 'Open Library'}
+                  </button>
+                )}
+              />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            title="No games saved yet"
+            description="Games you add from Discover will appear here, so you can jump back to your collection quickly."
+          />
+        )}
+      </section>
 
       <div style={{
         display: 'grid',
