@@ -41,9 +41,9 @@ const GameCard = ({
     switch (s?.toLowerCase()) {
       case 'playing':
         return {
-          bg: 'rgba(45, 212, 191, 0.14)',
-          border: 'rgba(45, 212, 191, 0.5)',
-          color: '#5eead4',
+          bg: 'var(--accent-bg)',
+          border: 'var(--accent-border)',
+          color: 'var(--accent-hover)',
           text: 'Playing'
         };
       case 'backlog':
