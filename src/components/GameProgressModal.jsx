@@ -83,6 +83,7 @@ const GameProgressModal = ({ game, onClose, onSave }) => {
     <div
       role="presentation"
       onClick={onClose}
+      className="progress-modal-backdrop"
       style={{
         position: 'fixed',
         inset: 0,
@@ -96,6 +97,7 @@ const GameProgressModal = ({ game, onClose, onSave }) => {
       }}
     >
       <section
+        className="progress-modal-panel"
         role="dialog"
         aria-modal="true"
         aria-labelledby={`progress-title-${game.id}`}
@@ -213,7 +215,7 @@ const GameProgressModal = ({ game, onClose, onSave }) => {
 
           {error && <p role="alert" style={{ margin: 0, color: '#fbbf24', fontSize: '0.82rem' }}>{error}</p>}
 
-          <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', flexWrap: 'wrap', borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
+          <div className="progress-modal-actions" style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', flexWrap: 'wrap', borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
             <button type="button" onClick={onClose} style={{
               border: '1px solid var(--border)',
               backgroundColor: 'transparent',
