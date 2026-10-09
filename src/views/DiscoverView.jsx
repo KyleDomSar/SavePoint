@@ -105,13 +105,13 @@ const DiscoverView = () => {
   }, 0);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
+    <div className="discover-view" style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
       <PageHeader
         title="Discover Games"
         description="Search the live game catalog and add titles to your personal collection."
       />
 
-      <div style={{
+      <div className="discover-controls-panel" style={{
         backgroundColor: 'var(--panel-bg)',
         border: '1px solid var(--border)',
         borderRadius: '12px',
@@ -121,7 +121,7 @@ const DiscoverView = () => {
         gap: '24px',
         boxShadow: 'var(--shadow)'
       }}>
-        <div style={{
+        <div className="discover-search-controls" style={{
           display: 'grid',
           gridTemplateColumns: 'minmax(0, 1fr) minmax(180px, auto)',
           gap: '20px',
@@ -240,7 +240,7 @@ const DiscoverView = () => {
         />
       ) : (
         <>
-          <div style={{
+          <div className="game-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
             gap: '16px'
