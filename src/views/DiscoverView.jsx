@@ -242,8 +242,8 @@ const DiscoverView = () => {
         <>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-            gap: '24px'
+            gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+            gap: '16px'
           }}>
             {games.map((game) => {
               const saved = collection[String(game.id)];
