@@ -1,7 +1,7 @@
 import PageHeader from '../components/PageHeader';
 import GameCard from '../components/GameCard';
 import EmptyState from '../components/EmptyState';
-import { useCollection } from '../contexts/CollectionContext';
+import { useCollection } from '../contexts/useCollection';
 
 const SECTIONS = [
   { title: 'Currently Playing', status: 'playing', emptyTitle: 'Nothing in progress', emptyDescription: 'Add a game to your library and set its status to Playing.' },

@@ -2,7 +2,7 @@ import PageHeader from '../components/PageHeader';
 import StatCard from '../components/StatCard';
 import GameCard from '../components/GameCard';
 import { GamepadIcon, TrophyIcon, WishlistIcon, ClockIcon } from '../components/Icons';
-import { useCollection } from '../contexts/CollectionContext';
+import { useCollection } from '../contexts/useCollection';
 
 const DashboardView = () => {
   const { items, storageError } = useCollection();

@@ -9,7 +9,7 @@ import LoadingSkeleton from '../components/LoadingSkeleton';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import { fetchGames } from '../services/gameApi';
-import { useCollection } from '../contexts/CollectionContext';
+import { useCollection } from '../contexts/useCollection';
 
 const PAGE_SIZE = 20;
 

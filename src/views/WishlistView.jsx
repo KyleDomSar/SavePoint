@@ -1,7 +1,7 @@
 import PageHeader from '../components/PageHeader';
 import GameCard from '../components/GameCard';
 import EmptyState from '../components/EmptyState';
-import { useCollection } from '../contexts/CollectionContext';
+import { useCollection } from '../contexts/useCollection';
 
 const WishlistView = () => {
   const { items, updateGameStatus, removeGame, storageError } = useCollection();

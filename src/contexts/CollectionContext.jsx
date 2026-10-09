@@ -1,9 +1,9 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { CollectionContext } from './collectionContext';
 
 const STORAGE_KEY = 'savepoint-collection';
 const VALID_STATUSES = ['playing', 'backlog', 'completed', 'wishlist'];
 
-const CollectionContext = createContext(null);
 
 function isValidCollection(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
@@ -68,7 +68,6 @@ export const CollectionProvider = ({ children }) => {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setStorageError('Changes are available for this session, but the browser could not save them. Check available storage and browser permissions.');
       // Stop retrying on every render after a quota or storage error.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCanPersist(false);
     }
   }, [collection, canPersist]);
@@ -142,8 +141,3 @@ export const CollectionProvider = ({ children }) => {
   );
 };
 
-export const useCollection = () => {
-  const context = useContext(CollectionContext);
-  if (!context) throw new Error('useCollection must be used within CollectionProvider');
-  return context;
-};
