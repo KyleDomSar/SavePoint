@@ -6,7 +6,13 @@ const SORT_OPTIONS = [
 ];
 
 const CollectionToolbar = ({
+  allGames = [],
   searchTerm,
+  platformFilter = '',
+  onPlatformFilterChange,
+  genreFilter = '',
+  onGenreFilterChange,
+  onClearFilters,
   onSearchTermChange,
   sortBy,
   onSortByChange,
@@ -15,6 +21,25 @@ const CollectionToolbar = ({
   itemLabel = 'games'
 }) => {
   const hasSearch = searchTerm.trim().length > 0;
+  const hasFilters = hasSearch || Boolean(platformFilter || genreFilter);
+  const getPlatformName = (game) => {
+    const platform = game?.platform;
+    if (Array.isArray(platform)) {
+      return platform.map((item) => typeof item === 'string' ? item : item?.name || '').filter(Boolean).join(', ');
+    }
+    if (typeof platform === 'string') return platform.trim();
+    return typeof platform?.name === 'string' ? platform.name.trim() : '';
+  };
+  const getGenreNames = (game) => {
+    if (!Array.isArray(game?.genres)) return [];
+    return game.genres
+      .map((genre) => typeof genre === 'string' ? genre : genre?.name || '')
+      .filter(Boolean);
+  };
+  const platforms = [...new Set(allGames.map(getPlatformName).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+  const genres = [...new Set(allGames.flatMap(getGenreNames))]
+    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
 
   return (
     <div style={{
@@ -72,6 +97,76 @@ const CollectionToolbar = ({
           onFocus={(event) => { event.currentTarget.style.borderColor = 'var(--accent-border)'; }}
           onBlur={(event) => { event.currentTarget.style.borderColor = 'var(--border)'; }}
         />
+      </div>
+
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '8px',
+        flexShrink: 0
+      }}>
+        {platforms.length > 1 && (
+          <select
+            value={platformFilter}
+            onChange={(event) => onPlatformFilterChange?.(event.target.value)}
+            aria-label="Filter by platform"
+            style={{
+              maxWidth: '170px',
+              minWidth: 0,
+              backgroundColor: 'var(--bg)',
+              border: '1px solid var(--border)',
+              color: 'var(--text-h)',
+              borderRadius: '8px',
+              padding: '10px 10px',
+              fontSize: '0.8rem',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="">All platforms</option>
+            {platforms.map((platform) => <option key={platform} value={platform}>{platform}</option>)}
+          </select>
+        )}
+        {genres.length > 1 && (
+          <select
+            value={genreFilter}
+            onChange={(event) => onGenreFilterChange?.(event.target.value)}
+            aria-label="Filter by genre"
+            style={{
+              maxWidth: '170px',
+              minWidth: 0,
+              backgroundColor: 'var(--bg)',
+              border: '1px solid var(--border)',
+              color: 'var(--text-h)',
+              borderRadius: '8px',
+              padding: '10px 10px',
+              fontSize: '0.8rem',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="">All genres</option>
+            {genres.map((genre) => <option key={genre} value={genre}>{genre}</option>)}
+          </select>
+        )}
+        {hasFilters && (
+          <button
+            type="button"
+            onClick={onClearFilters}
+            style={{
+              backgroundColor: 'transparent',
+              border: '1px solid var(--border)',
+              color: 'var(--text)',
+              borderRadius: '8px',
+              padding: '9px 10px',
+              fontSize: '0.8rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            Clear filters
+          </button>
+        )}
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
@@ -134,7 +229,7 @@ const CollectionToolbar = ({
         fontSize: '0.775rem',
         lineHeight: 1.4
       }} aria-live="polite">
-        {hasSearch
+        {hasFilters
           ? `Showing ${resultCount} of ${totalCount} ${itemLabel}`
           : `${totalCount} ${itemLabel} saved`}
       </div>
