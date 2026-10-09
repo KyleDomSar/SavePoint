@@ -1,78 +1,134 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 const STORAGE_KEY = 'savepoint-collection';
+const VALID_STATUSES = ['playing', 'backlog', 'completed', 'wishlist'];
 
 const CollectionContext = createContext(null);
 
+function isValidCollection(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+
+  return Object.entries(value).every(([key, game]) => (
+    game &&
+    typeof game === 'object' &&
+    !Array.isArray(game) &&
+    game.id !== undefined &&
+    game.id !== null &&
+    String(game.id) === key &&
+    typeof game.title === 'string' &&
+    VALID_STATUSES.includes(game.status)
+  ));
+}
+
+function readStoredCollection() {
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+
+    if (stored === null) {
+      return { collection: {}, canPersist: true, storageError: null };
+    }
+
+    const parsed = JSON.parse(stored);
+
+    if (!isValidCollection(parsed)) {
+      return {
+        collection: {},
+        canPersist: false,
+        storageError: 'The saved collection has an invalid format. It was left untouched so existing data is not overwritten.'
+      };
+    }
+
+    return { collection: parsed, canPersist: true, storageError: null };
+  } catch (error) {
+    console.error('SavePoint could not read the local collection:', error);
+    return {
+      collection: {},
+      canPersist: false,
+      storageError: 'Browser storage could not be read. Your existing saved data was left untouched.'
+    };
+  }
+}
+
 export const CollectionProvider = ({ children }) => {
-  const [collection, setCollection] = useState({});
-  const [isLoaded, setIsLoaded] = useState(false);
+  // Read storage during initialization so the empty default never overwrites
+  // an unreadable or malformed collection before it has been inspected.
+  const [initialStorage] = useState(readStoredCollection);
+  const [collection, setCollection] = useState(initialStorage.collection);
+  const [canPersist, setCanPersist] = useState(initialStorage.canPersist);
+  const [storageError, setStorageError] = useState(initialStorage.storageError);
 
-  // Load from localStorage on mount
   useEffect(() => {
+    if (!canPersist) return;
+
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (typeof parsed === 'object' && parsed !== null) {
-          setCollection(parsed);
-        }
-      }
-    } catch (e) {
-      console.error('Failed to load collection:', e);
-    } finally {
-      setIsLoaded(true);
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(collection));
+    } catch (error) {
+      console.error('SavePoint could not save the local collection:', error);
+      setStorageError('Changes are available for this session, but the browser could not save them. Check available storage and browser permissions.');
+      // Stop retrying on every render after a quota or storage error.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCanPersist(false);
     }
-  }, []);
-
-  // Sync to localStorage
-  useEffect(() => {
-    if (isLoaded) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(collection));
-      } catch (e) {
-        console.error('Failed to persist collection:', e);
-      }
-    }
-  }, [collection, isLoaded]);
+  }, [collection, canPersist]);
 
   const addGame = useCallback((game, status = 'backlog') => {
-    setCollection((prev) => {
-      const id = String(game.id);
+    if (!game || game.id === undefined || game.id === null || !VALID_STATUSES.includes(status)) {
+      return;
+    }
+
+    const id = String(game.id);
+    if (!game.title || typeof game.title !== 'string') return;
+
+    setCollection((previous) => {
+      const existing = previous[id];
       return {
-        ...prev,
-        [id]: { ...game, id, status, addedAt: Date.now() }
+        ...previous,
+        [id]: {
+          ...(existing || {}),
+          ...game,
+          id,
+          status,
+          addedAt: existing?.addedAt ?? Date.now()
+        }
       };
     });
   }, []);
 
   const updateGameStatus = useCallback((id, status) => {
-    setCollection((prev) => {
+    if (id === undefined || id === null || !VALID_STATUSES.includes(status)) return;
+
+    setCollection((previous) => {
       const stringId = String(id);
-      if (!prev[stringId]) return prev;
+      if (!previous[stringId] || previous[stringId].status === status) return previous;
+
       return {
-        ...prev,
-        [stringId]: { ...prev[stringId], status }
+        ...previous,
+        [stringId]: { ...previous[stringId], status }
       };
     });
   }, []);
 
   const removeGame = useCallback((id) => {
-    setCollection((prev) => {
-      const next = { ...prev };
-      delete next[String(id)];
+    if (id === undefined || id === null) return;
+
+    setCollection((previous) => {
+      const stringId = String(id);
+      if (!previous[stringId]) return previous;
+
+      const next = { ...previous };
+      delete next[stringId];
       return next;
     });
   }, []);
 
   const value = {
     collection,
-    isLoaded,
+    items: Object.values(collection),
+    isLoaded: true,
+    storageError,
     addGame,
     updateGameStatus,
-    removeGame,
-    // Helper to get array representation
-    items: Object.values(collection)
+    removeGame
   };
 
   return (

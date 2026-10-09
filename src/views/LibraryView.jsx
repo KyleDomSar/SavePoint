@@ -1,40 +1,72 @@
 import PageHeader from '../components/PageHeader';
 import GameCard from '../components/GameCard';
+import EmptyState from '../components/EmptyState';
+import { useCollection } from '../contexts/CollectionContext';
+
+const SECTIONS = [
+  { title: 'Currently Playing', status: 'playing', emptyTitle: 'Nothing in progress', emptyDescription: 'Add a game to your library and set its status to Playing.' },
+  { title: 'Gaming Backlog', status: 'backlog', emptyTitle: 'Your backlog is clear', emptyDescription: 'Discover games you want to play and save them to your library.' },
+  { title: 'Completed Collection', status: 'completed', emptyTitle: 'No completed games yet', emptyDescription: 'When you finish a game, change its status to Completed here.' }
+];
+
+const selectStyle = {
+  flex: 1,
+  minWidth: 0,
+  backgroundColor: 'var(--bg)',
+  border: '1px solid var(--border)',
+  color: 'var(--text-h)',
+  borderRadius: '6px',
+  padding: '8px 10px',
+  fontSize: '0.75rem',
+  fontWeight: '600',
+  cursor: 'pointer'
+};
+
+const removeButtonStyle = {
+  backgroundColor: 'transparent',
+  border: '1px solid var(--border)',
+  color: 'var(--text)',
+  borderRadius: '6px',
+  padding: '8px 10px',
+  fontSize: '0.75rem',
+  fontWeight: '600',
+  cursor: 'pointer'
+};
 
 const LibraryView = () => {
-  const libraryData = [
-    { title: 'Bloodborne', platform: 'PS4', coverUrl: 'https://images.unsplash.com/photo-1592155931584-901ac15763e3?auto=format&fit=crop&w=400&q=80', status: 'Completed', playtime: 86, rating: 5, releaseDate: '2015' },
-    { title: 'Sekiro: Shadows Die Twice', platform: 'Steam', coverUrl: 'https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=400&q=80', status: 'Completed', playtime: 54, rating: 5, releaseDate: '2019' },
-    { title: 'The Witcher 3: Wild Hunt', platform: 'Steam', coverUrl: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=400&q=80', status: 'Backlog', playtime: 4, rating: 5, releaseDate: '2015' },
-    { title: 'Marvel\'s Spider-Man 2', platform: 'PS5', coverUrl: 'https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?auto=format&fit=crop&w=400&q=80', status: 'Completed', playtime: 28, rating: 4, releaseDate: '2023' },
-    { title: 'Armored Core VI: Fires of Rubicon', platform: 'Steam', coverUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=400&q=80', status: 'Backlog', playtime: 0, rating: 0, releaseDate: '2023' },
-    { title: 'Resident Evil 4 Remake', platform: 'Steam', coverUrl: 'https://images.unsplash.com/photo-1589241062272-c0a000072dfa?auto=format&fit=crop&w=400&q=80', status: 'Backlog', playtime: 0, rating: 0, releaseDate: '2023' },
-  ];
-
-  const sections = [
-    { title: 'Currently Playing', status: 'Playing' },
-    { title: 'Gaming Backlog', status: 'Backlog' },
-    { title: 'Completed Collection', status: 'Completed' }
-  ];
+  const { items, updateGameStatus, removeGame, storageError } = useCollection();
+  const libraryGames = items
+    .filter((game) => game.status !== 'wishlist')
+    .sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', width: '100%' }}>
       <PageHeader
         title="My Library"
-        description="Organize and manage your personal video game collection across all platforms."
+        description="Manage your collection and update each game's status as you play."
       />
 
-      {sections.map((section, idx) => {
-        const games = libraryData.filter(g =>
-          section.status === 'Playing'
-            ? g.status.toLowerCase() === 'playing'
-            : g.status.toLowerCase() === section.status.toLowerCase()
-        );
+      {storageError && (
+        <div role="alert" style={{
+          padding: '14px 16px',
+          backgroundColor: 'rgba(245, 158, 11, 0.08)',
+          border: '1px solid rgba(245, 158, 11, 0.45)',
+          borderRadius: '10px',
+          color: 'var(--text-h)',
+          fontSize: '0.875rem',
+          lineHeight: 1.5
+        }}>
+          {storageError}
+        </div>
+      )}
+
+      {SECTIONS.map((section) => {
+        const games = libraryGames.filter((game) => game.status === section.status);
 
         return (
-          <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <section key={section.status} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <h2 style={{ fontSize: '1.25rem', color: 'var(--text-h)' }}>{section.title}</h2>
+              <h2 style={{ fontSize: '1.25rem', color: 'var(--text-h)', margin: 0 }}>{section.title}</h2>
               <span style={{
                 backgroundColor: 'var(--border)',
                 color: 'var(--text)',
@@ -53,23 +85,39 @@ const LibraryView = () => {
                 gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
                 gap: '24px'
               }}>
-                {games.map((game, i) => (
-                  <GameCard key={i} {...game} />
+                {games.map((game) => (
+                  <GameCard
+                    key={game.id}
+                    {...game}
+                    actionButton={
+                      <select
+                        aria-label={`Change status for ${game.title}`}
+                        value={game.status}
+                        onChange={(event) => updateGameStatus(game.id, event.target.value)}
+                        style={selectStyle}
+                      >
+                        <option value="playing">Playing</option>
+                        <option value="backlog">Backlog</option>
+                        <option value="completed">Completed</option>
+                      </select>
+                    }
+                    secondaryAction={
+                      <button
+                        type="button"
+                        onClick={() => removeGame(game.id)}
+                        style={removeButtonStyle}
+                        aria-label={`Remove ${game.title} from library`}
+                      >
+                        Remove
+                      </button>
+                    }
+                  />
                 ))}
               </div>
             ) : (
-              <div style={{
-                padding: '40px',
-                border: '1px dashed var(--border)',
-                borderRadius: '12px',
-                textAlign: 'center',
-                color: 'var(--text)',
-                fontSize: '0.875rem'
-              }}>
-                No games currently in this section.
-              </div>
+              <EmptyState title={section.emptyTitle} description={section.emptyDescription} />
             )}
-          </div>
+          </section>
         );
       })}
     </div>

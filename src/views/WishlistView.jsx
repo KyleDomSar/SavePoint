@@ -1,51 +1,102 @@
 import PageHeader from '../components/PageHeader';
 import GameCard from '../components/GameCard';
+import EmptyState from '../components/EmptyState';
+import { useCollection } from '../contexts/CollectionContext';
 
 const WishlistView = () => {
-  const wishlistData = [
-    { title: 'Grand Theft Auto VI', platform: 'PS5', coverUrl: 'https://images.unsplash.com/photo-1627373100182-03c0e39f7548?auto=format&fit=crop&w=400&q=80', status: 'Wishlist', playtime: 0, rating: 0, releaseDate: '2025' },
-    { title: 'Metroid Prime 4: Beyond', platform: 'Switch', coverUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=400&q=80', status: 'Wishlist', playtime: 0, rating: 0, releaseDate: '2025' },
-    { title: 'Monster Hunter Wilds', platform: 'Steam', coverUrl: 'https://images.unsplash.com/photo-1595113316349-9fa4ee24f884?auto=format&fit=crop&w=400&q=80', status: 'Wishlist', playtime: 0, rating: 0, releaseDate: '2025' },
-    { title: 'Fable', platform: 'Xbox', coverUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=400&q=80', status: 'Wishlist', playtime: 0, rating: 0, releaseDate: '2025' },
-    { title: 'DOOM: The Dark Ages', platform: 'Steam', coverUrl: 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&w=400&q=80', status: 'Wishlist', playtime: 0, rating: 0, releaseDate: '2025' },
-  ];
+  const { items, updateGameStatus, removeGame, storageError } = useCollection();
+  const wishlistGames = items
+    .filter((game) => game.status === 'wishlist')
+    .sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
       <PageHeader
         title="Wishlist"
-        description="Monitor upcoming releases and games you're planning to play next."
+        description="Keep track of games you want to play and move them to your library when you're ready."
       />
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ fontSize: '1.25rem', color: 'var(--text-h)' }}>Tracked Games ({wishlistData.length})</h2>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button disabled style={{ backgroundColor: 'var(--panel-bg)', border: '1px solid var(--border)', color: 'var(--text)', padding: '6px 12px', borderRadius: '6px', fontSize: '0.8rem', cursor: 'not-allowed' }}>Price Alerts</button>
-          <button disabled style={{ backgroundColor: 'var(--panel-bg)', border: '1px solid var(--border)', color: 'var(--text)', padding: '6px 12px', borderRadius: '6px', fontSize: '0.8rem', cursor: 'not-allowed' }}>Sort: Release Date</button>
-        </div>
-      </div>
-
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-        gap: '24px'
-      }}>
-        {wishlistData.map((game, i) => (
-          <GameCard key={i} {...game} />
-        ))}
-      </div>
-
-      {wishlistData.length === 0 && (
-        <div style={{
-          padding: '80px 40px',
-          border: '1px dashed var(--border)',
-          borderRadius: '12px',
-          textAlign: 'center',
-          color: 'var(--text)',
-          fontSize: '1rem'
+      {storageError && (
+        <div role="alert" style={{
+          padding: '14px 16px',
+          backgroundColor: 'rgba(245, 158, 11, 0.08)',
+          border: '1px solid rgba(245, 158, 11, 0.45)',
+          borderRadius: '10px',
+          color: 'var(--text-h)',
+          fontSize: '0.875rem',
+          lineHeight: 1.5
         }}>
-          Your wishlist is empty. Start discovering games to fill it up!
+          {storageError}
         </div>
+      )}
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+        <h2 style={{ fontSize: '1.25rem', color: 'var(--text-h)', margin: 0 }}>
+          Tracked Games ({wishlistGames.length})
+        </h2>
+        <span style={{ color: 'var(--text)', fontSize: '0.8rem' }}>
+          {wishlistGames.length === 1 ? '1 game saved' : `${wishlistGames.length} games saved`}
+        </span>
+      </div>
+
+      {wishlistGames.length > 0 ? (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+          gap: '24px'
+        }}>
+          {wishlistGames.map((game) => (
+            <GameCard
+              key={game.id}
+              {...game}
+              actionButton={
+                <button
+                  type="button"
+                  onClick={() => updateGameStatus(game.id, 'backlog')}
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    backgroundColor: 'var(--accent)',
+                    color: 'var(--text-h)',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '8px 10px',
+                    fontSize: '0.75rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    boxShadow: 'var(--glow)'
+                  }}
+                >
+                  Move to Library
+                </button>
+              }
+              secondaryAction={
+                <button
+                  type="button"
+                  onClick={() => removeGame(game.id)}
+                  aria-label={`Remove ${game.title} from wishlist`}
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: '1px solid var(--border)',
+                    color: 'var(--text)',
+                    borderRadius: '6px',
+                    padding: '8px 10px',
+                    fontSize: '0.75rem',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Remove
+                </button>
+              }
+            />
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          title="Your wishlist is empty"
+          description="Open Discover to find games you want to play later, then add them to your Wishlist."
+        />
       )}
     </div>
   );

@@ -13,31 +13,36 @@ import { useCollection } from '../contexts/CollectionContext';
 
 const PAGE_SIZE = 20;
 
+const baseButtonStyle = {
+  flex: 1,
+  minWidth: 0,
+  borderRadius: '6px',
+  padding: '8px 10px',
+  fontSize: '0.75rem',
+  fontWeight: '700',
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
+  transition: 'opacity 0.2s ease, border-color 0.2s ease'
+};
+
 const DiscoverView = () => {
   const [games, setGames] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalCount, setTotalCount] = useState(0);
-
-  // Filters and Navigation State
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState({ genres: '', platforms: '' });
   const [ordering, setOrdering] = useState('');
   const [page, setPage] = useState(1);
 
-  const { collection, addGame } = useCollection();
-
-  // Request sequencing and cancellation tracking
+  const { collection, addGame, updateGameStatus, removeGame } = useCollection();
   const abortControllerRef = useRef(null);
   const requestIdRef = useRef(0);
 
   const loadGames = useCallback(async (isRetry = false) => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
+    abortControllerRef.current?.abort();
     const controller = new AbortController();
     abortControllerRef.current = controller;
-
     const currentRequestId = ++requestIdRef.current;
 
     setIsLoading(true);
@@ -63,22 +68,18 @@ const DiscoverView = () => {
       if (err.name === 'AbortError' || currentRequestId !== requestIdRef.current) return;
       setError(err.message || 'An unexpected error occurred while fetching games.');
     } finally {
-      if (currentRequestId === requestIdRef.current) {
-        setIsLoading(false);
-      }
+      if (currentRequestId === requestIdRef.current) setIsLoading(false);
     }
   }, [search, filters, ordering, page]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadGames();
-    return () => {
-      if (abortControllerRef.current) abortControllerRef.current.abort();
-    };
+    return () => abortControllerRef.current?.abort();
   }, [loadGames]);
 
-  const handleSearchChange = (val) => {
-    setSearch(val);
+  const handleSearchChange = (value) => {
+    setSearch(value);
     setPage(1);
   };
 
@@ -87,8 +88,8 @@ const DiscoverView = () => {
     setPage(1);
   };
 
-  const handleSortChange = (val) => {
-    setOrdering(val);
+  const handleSortChange = (value) => {
+    setOrdering(value);
     setPage(1);
   };
 
@@ -98,10 +99,9 @@ const DiscoverView = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
       <PageHeader
         title="Discover Games"
-        description="Search for new releases and discover iconic titles to add to your collection."
+        description="Search the live game catalog and add titles to your personal collection."
       />
 
-      {/* API Interaction Controls */}
       <div style={{
         backgroundColor: 'var(--panel-bg)',
         border: '1px solid var(--border)',
@@ -114,25 +114,21 @@ const DiscoverView = () => {
       }}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '1fr auto',
+          gridTemplateColumns: 'minmax(0, 1fr) minmax(180px, auto)',
           gap: '20px',
-          alignItems: 'center',
-          flexWrap: 'wrap'
+          alignItems: 'center'
         }}>
           <SearchBar value={search} onChange={handleSearchChange} />
           <SortSelector value={ordering} onChange={handleSortChange} />
         </div>
 
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: '20px' }}>
-          <FilterBar
-            activeFilters={filters}
-            onFiltersChange={handleFiltersChange}
-          />
+          <FilterBar activeFilters={filters} onFiltersChange={handleFiltersChange} />
         </div>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
-        <h2 style={{ fontSize: '1.25rem', color: 'var(--text-h)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginTop: '12px' }}>
+        <h2 style={{ fontSize: '1.25rem', color: 'var(--text-h)', margin: 0 }}>
           {search ? `Results for "${search}"` : 'Trending Releases'}
         </h2>
         {totalCount > 0 && !isLoading && (
@@ -142,7 +138,6 @@ const DiscoverView = () => {
         )}
       </div>
 
-      {/* Results Rendering */}
       {error ? (
         <ErrorState message={error} onRetry={() => loadGames(true)} />
       ) : isLoading ? (
@@ -150,7 +145,7 @@ const DiscoverView = () => {
       ) : games.length === 0 ? (
         <EmptyState
           title={search ? 'No matches found' : 'The catalog is empty'}
-          description={search ? `We couldn't find any games matching "${search}". Try checking your spelling or using fewer filters.` : 'Check back later for new releases!'}
+          description={search ? `We couldn't find any games matching "${search}". Try checking your spelling or using fewer filters.` : 'Check back later for new releases.'}
         />
       ) : (
         <>
@@ -161,52 +156,90 @@ const DiscoverView = () => {
           }}>
             {games.map((game) => {
               const saved = collection[String(game.id)];
-              const isSaved = Boolean(saved);
-              const currentStatus = saved ? saved.status : undefined;
-
-              const addToLibraryBtn = (
+              const savedStatus = saved?.status;
+              const actionButton = !saved ? (
                 <button
                   type="button"
                   onClick={() => addGame(game, 'backlog')}
                   style={{
-                    flex: 1,
+                    ...baseButtonStyle,
                     backgroundColor: 'var(--accent)',
                     color: 'var(--text-h)',
                     border: 'none',
-                    borderRadius: '6px',
-                    padding: '8px 12px',
-                    fontSize: '0.75rem',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    transition: 'opacity 0.2s ease',
                     boxShadow: 'var(--glow)'
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
-                  onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
                 >
                   + Library
                 </button>
+              ) : savedStatus === 'wishlist' ? (
+                <button
+                  type="button"
+                  onClick={() => updateGameStatus(game.id, 'backlog')}
+                  style={{
+                    ...baseButtonStyle,
+                    backgroundColor: 'var(--accent)',
+                    color: 'var(--text-h)',
+                    border: 'none',
+                    boxShadow: 'var(--glow)'
+                  }}
+                >
+                  Move to Library
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  style={{
+                    ...baseButtonStyle,
+                    backgroundColor: 'var(--bg)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--text)',
+                    cursor: 'default',
+                    opacity: 0.8
+                  }}
+                >
+                  In Library
+                </button>
               );
 
-              const addToWishlistBtn = (
+              const secondaryAction = !saved ? (
                 <button
                   type="button"
                   onClick={() => addGame(game, 'wishlist')}
                   style={{
+                    ...baseButtonStyle,
                     backgroundColor: 'var(--bg)',
                     border: '1px solid var(--border)',
-                    color: 'var(--text-h)',
-                    borderRadius: '6px',
-                    padding: '8px 12px',
-                    fontSize: '0.75rem',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'border-color 0.2s ease'
+                    color: 'var(--text-h)'
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--accent-border)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
                 >
-                  ♥ Wishlist
+                  Wishlist
+                </button>
+              ) : savedStatus === 'wishlist' ? (
+                <button
+                  type="button"
+                  onClick={() => removeGame(game.id)}
+                  style={{
+                    ...baseButtonStyle,
+                    backgroundColor: 'transparent',
+                    border: '1px solid var(--border)',
+                    color: 'var(--text)'
+                  }}
+                >
+                  Remove
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => updateGameStatus(game.id, 'wishlist')}
+                  style={{
+                    ...baseButtonStyle,
+                    backgroundColor: 'var(--bg)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--text-h)'
+                  }}
+                >
+                  Move to Wishlist
                 </button>
               );
 
@@ -214,9 +247,9 @@ const DiscoverView = () => {
                 <GameCard
                   key={game.id}
                   {...game}
-                  status={currentStatus}
-                  actionButton={!isSaved ? addToLibraryBtn : undefined}
-                  secondaryAction={!isSaved ? addToWishlistBtn : undefined}
+                  status={savedStatus}
+                  actionButton={actionButton}
+                  secondaryAction={secondaryAction}
                 />
               );
             })}
@@ -226,12 +259,11 @@ const DiscoverView = () => {
             page={page}
             totalPages={totalPages}
             hasNext={page < totalPages}
-            onPageChange={(newPage) => setPage(newPage)}
+            onPageChange={setPage}
           />
         </>
       )}
 
-      {/* Mandatory RAWG Attribution Footer */}
       <footer style={{
         marginTop: '32px',
         padding: '24px 0',
