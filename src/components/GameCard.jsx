@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StarIcon, ClockIcon } from './Icons';
 import GameDetailsModal from './GameDetailsModal';
+import GameProgressModal from './GameProgressModal';
 
 const GameCard = ({
   id,
@@ -12,10 +13,15 @@ const GameCard = ({
   rating,
   releaseDate,
   actionButton,
-  secondaryAction
+  secondaryAction,
+  personalPlaytime,
+  personalRating,
+  personalNotes,
+  onSaveProgress
 }) => {
   const [imageError, setImageError] = useState(!coverUrl);
   const [showDetails, setShowDetails] = useState(false);
+  const [showProgressEditor, setShowProgressEditor] = useState(false);
 
   const getStatusStyle = (s) => {
     switch (s?.toLowerCase()) {
@@ -241,6 +247,38 @@ const GameCard = ({
               View details <span aria-hidden="true">→</span>
             </button>
           )}
+          {onSaveProgress && (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              gap: '6px',
+              marginTop: '4px'
+            }}>
+              <span style={{ color: 'var(--text)', fontSize: '0.75rem', lineHeight: 1.5 }}>
+                Your stats: {typeof personalPlaytime === 'number' ? `${personalPlaytime}h` : 'No hours logged'}
+                {' · '}
+                {typeof personalRating === 'number' ? `${personalRating}/5 stars` : 'Not rated'}
+                {personalNotes?.trim() ? ' · Notes saved' : ''}
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowProgressEditor(true)}
+                style={{
+                  backgroundColor: 'var(--accent-bg)',
+                  border: '1px solid var(--accent-border)',
+                  color: 'var(--text-h)',
+                  borderRadius: '7px',
+                  padding: '7px 10px',
+                  fontSize: '0.75rem',
+                  fontWeight: '700',
+                  cursor: 'pointer'
+                }}
+              >
+                Edit Progress
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Ratings / Playtime + Action Buttons */}
@@ -304,6 +342,14 @@ const GameCard = ({
       <GameDetailsModal
         game={{ id, title, coverUrl, platform, rating, releaseDate }}
         onClose={() => setShowDetails(false)}
+      />
+    )}
+    {showProgressEditor && onSaveProgress && (
+      <GameProgressModal
+        key={id}
+        game={{ id, title, playtimePlayed, personalRating, personalNotes }}
+        onClose={() => setShowProgressEditor(false)}
+        onSave={onSaveProgress}
       />
     )}
     </>

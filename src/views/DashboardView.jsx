@@ -1,7 +1,7 @@
 import PageHeader from '../components/PageHeader';
 import StatCard from '../components/StatCard';
 import GameCard from '../components/GameCard';
-import { GamepadIcon, TrophyIcon, WishlistIcon, ClockIcon } from '../components/Icons';
+import { GamepadIcon, TrophyIcon, WishlistIcon, ClockIcon, StarIcon } from '../components/Icons';
 import { useCollection } from '../contexts/useCollection';
 
 const DashboardView = () => {
@@ -12,6 +12,15 @@ const DashboardView = () => {
   const wishlistCount = items.filter((game) => game.status === 'wishlist').length;
   const completedCount = libraryGames.filter((game) => game.status === 'completed').length;
   const playingGames = libraryGames.filter((game) => game.status === 'playing');
+  const ratedGames = libraryGames.filter((game) => Number.isInteger(game.personalRating) && game.personalRating >= 1 && game.personalRating <= 5);
+  const averagePersonalRating = ratedGames.length
+    ? `${(ratedGames.reduce((total, game) => total + game.personalRating, 0) / ratedGames.length).toFixed(1)} / 5`
+    : 'Not rated';
+  const totalPersonalPlaytime = libraryGames.reduce((total, game) => {
+    const hours = Number(game.playtimePlayed);
+    return total + (Number.isFinite(hours) && hours > 0 ? hours : 0);
+  }, 0);
+  const displayedPlaytime = `${Number(totalPersonalPlaytime.toFixed(1))}h`;
   const completionRate = librarySize > 0
     ? `${((completedCount / librarySize) * 100).toFixed(1)}%`
     : '0.0%';
@@ -20,7 +29,9 @@ const DashboardView = () => {
     { title: 'Library Size', value: String(librarySize), icon: <GamepadIcon />, description: 'Games saved to your library' },
     { title: 'Wishlist Count', value: String(wishlistCount), icon: <WishlistIcon />, description: 'Games you want to play' },
     { title: 'Completion Rate', value: completionRate, icon: <TrophyIcon />, description: `${completedCount} games completed` },
-    { title: 'Currently Playing', value: String(playingGames.length), icon: <ClockIcon />, description: 'Marked as in progress' }
+    { title: 'Currently Playing', value: String(playingGames.length), icon: <ClockIcon />, description: 'Marked as in progress' },
+    { title: 'Total Playtime', value: displayedPlaytime, icon: <ClockIcon />, description: 'Hours you logged yourself' },
+    { title: 'Average Personal Rating', value: averagePersonalRating, icon: <StarIcon />, description: `${ratedGames.length} games personally rated` }
   ];
 
   return (

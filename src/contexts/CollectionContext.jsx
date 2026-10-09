@@ -111,6 +111,41 @@ export const CollectionProvider = ({ children }) => {
     });
   }, []);
 
+  const updateGameProgress = useCallback((id, progress = {}) => {
+    if (id === undefined || id === null || !progress || typeof progress !== 'object') return;
+
+    const rawHours = progress.playtimePlayed;
+    const hours = rawHours === '' || rawHours === null || rawHours === undefined
+      ? null
+      : Number(rawHours);
+    if (hours !== null && (!Number.isFinite(hours) || hours < 0 || hours > 100000)) return;
+
+    const rawRating = progress.personalRating;
+    const personalRating = rawRating === '' || rawRating === null || rawRating === undefined
+      ? null
+      : Number(rawRating);
+    if (personalRating !== null && (!Number.isInteger(personalRating) || personalRating < 1 || personalRating > 5)) return;
+
+    const personalNotes = typeof progress.personalNotes === 'string'
+      ? progress.personalNotes.slice(0, 2000)
+      : '';
+
+    setCollection((previous) => {
+      const stringId = String(id);
+      if (!previous[stringId]) return previous;
+
+      return {
+        ...previous,
+        [stringId]: {
+          ...previous[stringId],
+          playtimePlayed: hours === null ? null : Math.round(hours * 10) / 10,
+          personalRating,
+          personalNotes
+        }
+      };
+    });
+  }, []);
+
   const removeGame = useCallback((id) => {
     if (id === undefined || id === null) return;
 
@@ -131,6 +166,7 @@ export const CollectionProvider = ({ children }) => {
     storageError,
     addGame,
     updateGameStatus,
+    updateGameProgress,
     removeGame
   };
 

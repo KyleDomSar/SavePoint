@@ -34,7 +34,7 @@ const removeButtonStyle = {
 };
 
 const LibraryView = () => {
-  const { items, updateGameStatus, removeGame, storageError } = useCollection();
+  const { items, updateGameStatus, updateGameProgress, removeGame, storageError } = useCollection();
   const libraryGames = items
     .filter((game) => game.status !== 'wishlist')
     .sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
@@ -89,6 +89,10 @@ const LibraryView = () => {
                   <GameCard
                     key={game.id}
                     {...game}
+                    personalPlaytime={game.playtimePlayed}
+                    personalRating={game.personalRating}
+                    personalNotes={game.personalNotes}
+                    onSaveProgress={(progress) => updateGameProgress(game.id, progress)}
                     actionButton={
                       <select
                         aria-label={`Change status for ${game.title}`}
