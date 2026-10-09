@@ -212,7 +212,7 @@ const GameCard = ({
       </div>
 
       {/* Info Area */}
-      <div style={{
+      <div className="game-card-info" style={{
         padding: '12px',
         display: 'flex',
         flexDirection: 'column',
@@ -362,7 +362,7 @@ const GameCard = ({
 
           {/* Optional Action Buttons for Phase 3 */}
           {(actionButton || secondaryAction) && (
-            <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+            <div className="game-card-actions" style={{ display: 'flex', gap: '8px', width: '100%' }}>
               {actionButton}
               {secondaryAction}
             </div>
