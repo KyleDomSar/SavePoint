@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react';
 import PageHeader from '../components/PageHeader';
 import StatCard from '../components/StatCard';
 import GameCard from '../components/GameCard';
@@ -5,7 +6,78 @@ import { GamepadIcon, TrophyIcon, WishlistIcon, ClockIcon, StarIcon } from '../c
 import { useCollection } from '../contexts/useCollection';
 
 const DashboardView = () => {
-  const { items, storageError } = useCollection();
+  const { items, storageError, importCollection } = useCollection();
+  const backupInputRef = useRef(null);
+  const [backupMessage, setBackupMessage] = useState(null);
+
+  const handleExportBackup = () => {
+    const backup = {
+      format: 'savepoint-collection-backup',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      games: items
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `savepoint-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+    setBackupMessage({
+      type: 'success',
+      text: `Backup exported with ${items.length} ${items.length === 1 ? 'game' : 'games'}.`
+    });
+  };
+
+  const handleImportBackup = async (event) => {
+    const file = event.currentTarget.files?.[0];
+    if (!file) return;
+
+    try {
+      if (file.size > 5 * 1024 * 1024) {
+        setBackupMessage({ type: 'error', text: 'This backup is larger than 5 MB and was not imported.' });
+        return;
+      }
+
+      const backup = JSON.parse(await file.text());
+      if (
+        !backup ||
+        typeof backup !== 'object' ||
+        backup.format !== 'savepoint-collection-backup' ||
+        backup.version !== 1 ||
+        !Array.isArray(backup.games)
+      ) {
+        setBackupMessage({
+          type: 'error',
+          text: 'This file is not a supported SavePoint backup. Your collection was not changed.'
+        });
+        return;
+      }
+
+      const result = importCollection(backup.games);
+      if (!result.success) {
+        setBackupMessage({ type: 'error', text: result.message });
+        return;
+      }
+
+      setBackupMessage({
+        type: 'success',
+        text: result.count === 0
+          ? 'The backup is valid but empty. Your current collection was kept.'
+          : `Backup merged: ${result.added} added, ${result.updated} updated. Games not in the backup were kept.`
+      });
+    } catch {
+      setBackupMessage({
+        type: 'error',
+        text: 'Could not read this backup file. Make sure it is valid JSON. Your collection was not changed.'
+      });
+    } finally {
+      event.currentTarget.value = '';
+    }
+  };
 
   const libraryGames = items.filter((game) => game.status !== 'wishlist');
   const librarySize = libraryGames.length;
@@ -109,6 +181,65 @@ const DashboardView = () => {
                 {storageError || 'Your collection is stored locally in this browser. It does not automatically sync across devices or browsers.'}
               </p>
             </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={handleExportBackup}
+                style={{
+                  backgroundColor: 'var(--accent)',
+                  color: 'var(--text-h)',
+                  border: '1px solid var(--accent-border)',
+                  borderRadius: '8px',
+                  padding: '9px 12px',
+                  fontSize: '0.8rem',
+                  fontWeight: '700',
+                  cursor: 'pointer'
+                }}
+              >
+                Export backup
+              </button>
+              <button
+                type="button"
+                onClick={() => backupInputRef.current?.click()}
+                style={{
+                  backgroundColor: 'var(--bg)',
+                  color: 'var(--text-h)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '8px',
+                  padding: '9px 12px',
+                  fontSize: '0.8rem',
+                  fontWeight: '700',
+                  cursor: 'pointer'
+                }}
+              >
+                Import backup
+              </button>
+              <input
+                ref={backupInputRef}
+                type="file"
+                accept=".json,application/json"
+                aria-label="Choose a SavePoint JSON backup"
+                onChange={handleImportBackup}
+                style={{ display: 'none' }}
+              />
+            </div>
+            {backupMessage && (
+              <div
+                role="status"
+                aria-live="polite"
+                style={{
+                  padding: '10px 12px',
+                  borderRadius: '8px',
+                  backgroundColor: backupMessage.type === 'error' ? 'rgba(245, 158, 11, 0.08)' : 'var(--accent-bg)',
+                  border: `1px solid ${backupMessage.type === 'error' ? 'rgba(245, 158, 11, 0.45)' : 'var(--accent-border)'}`,
+                  color: 'var(--text-h)',
+                  fontSize: '0.8rem',
+                  lineHeight: 1.5
+                }}
+              >
+                {backupMessage.text}
+              </div>
+            )}
             <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
               <div style={{ color: 'var(--text-h)', fontWeight: '700', fontSize: '0.9rem', marginBottom: '5px' }}>
                 Live game catalog
