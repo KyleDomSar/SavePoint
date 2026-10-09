@@ -3,12 +3,14 @@ import PageHeader from '../components/PageHeader';
 import GameCard from '../components/GameCard';
 import EmptyState from '../components/EmptyState';
 import CollectionToolbar from '../components/CollectionToolbar';
+import ConfirmationDialog from '../components/ConfirmationDialog';
 import { useCollection } from '../contexts/useCollection';
 
 const WishlistView = () => {
   const { items, updateGameStatus, removeGame, storageError } = useCollection();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('recent');
+  const [gameToRemove, setGameToRemove] = useState(null);
   const allWishlistGames = items.filter((game) => game.status === 'wishlist');
   const query = searchTerm.trim().toLocaleLowerCase();
 
@@ -111,7 +113,7 @@ const WishlistView = () => {
               secondaryAction={
                 <button
                   type="button"
-                  onClick={() => removeGame(game.id)}
+                  onClick={() => setGameToRemove(game)}
                   aria-label={`Remove ${game.title} from wishlist`}
                   style={{
                     backgroundColor: 'transparent',
@@ -159,6 +161,16 @@ const WishlistView = () => {
           description="Open Discover to find games you want to play later, then add them to your Wishlist."
         />
       )}
+
+      <ConfirmationDialog
+        game={gameToRemove}
+        collectionName="wishlist"
+        onCancel={() => setGameToRemove(null)}
+        onConfirm={() => {
+          if (gameToRemove) removeGame(gameToRemove.id);
+          setGameToRemove(null);
+        }}
+      />
     </div>
   );
 };
