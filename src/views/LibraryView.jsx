@@ -3,6 +3,7 @@ import PageHeader from '../components/PageHeader';
 import GameCard from '../components/GameCard';
 import EmptyState from '../components/EmptyState';
 import CollectionToolbar from '../components/CollectionToolbar';
+import ConfirmationDialog from '../components/ConfirmationDialog';
 import { useCollection } from '../contexts/useCollection';
 
 const SECTIONS = [
@@ -39,6 +40,7 @@ const LibraryView = () => {
   const { items, updateGameStatus, updateGameProgress, removeGame, storageError } = useCollection();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('recent');
+  const [gameToRemove, setGameToRemove] = useState(null);
   const allLibraryGames = items.filter((game) => game.status !== 'wishlist');
   const query = searchTerm.trim().toLocaleLowerCase();
 
@@ -170,7 +172,7 @@ const LibraryView = () => {
                     secondaryAction={
                       <button
                         type="button"
-                        onClick={() => removeGame(game.id)}
+                        onClick={() => setGameToRemove(game)}
                         style={removeButtonStyle}
                         aria-label={`Remove ${game.title} from library`}
                       >
@@ -197,6 +199,16 @@ const LibraryView = () => {
           </section>
         );
       })}
+
+      <ConfirmationDialog
+        game={gameToRemove}
+        collectionName="library"
+        onCancel={() => setGameToRemove(null)}
+        onConfirm={() => {
+          if (gameToRemove) removeGame(gameToRemove.id);
+          setGameToRemove(null);
+        }}
+      />
     </div>
   );
 };
