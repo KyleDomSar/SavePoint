@@ -37,6 +37,7 @@ const ConfirmationDialog = ({
 
   return (
     <div
+      className="confirmation-dialog-backdrop"
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onCancel();
@@ -54,6 +55,7 @@ const ConfirmationDialog = ({
       }}
     >
       <section
+        className="confirmation-dialog-panel"
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="remove-game-title"
@@ -119,7 +121,7 @@ const ConfirmationDialog = ({
           </p>
         </div>
 
-        <div style={{
+        <div className="confirmation-dialog-actions" style={{
           display: 'flex',
           justifyContent: 'flex-end',
           flexWrap: 'wrap',
